@@ -1,7 +1,7 @@
 #include "elementi.h"
 
 Cella::Cella(){
-    tempo=8;
+    tempo=0;
     flag_error=0;
 }
 
