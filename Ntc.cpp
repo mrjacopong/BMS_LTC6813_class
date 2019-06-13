@@ -27,4 +27,3 @@ for(uint8_t current_ntc=0;current_ntc<TOTAL_NTC;current_ntc++){
 return false;
 }
 }
-

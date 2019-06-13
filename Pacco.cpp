@@ -1,5 +1,4 @@
 #include "elementi.h"
-#include "ltc681x.h"
 
 
 Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){

@@ -40,9 +40,9 @@ class Modulo: public Elemento_circuitale{
        int n_celle;
        int n_ntc;
     public :
-       Modulo(int N_celle,int N_ntc){};
-       bool error_check(cell_asic bms_ic[]){};
-       bool carica(cell_asic bms_ic[]){};
+       Modulo(int N_celle,int N_ntc);
+       bool error_check(cell_asic bms_ic[]);
+       bool carica(cell_asic bms_ic[]);
 };
 
 class Pacco: public Elemento_circuitale{
@@ -52,8 +52,8 @@ class Pacco: public Elemento_circuitale{
        int n_moduli;
     public :
        cell_asic bms_ic;
-       Pacco(int N_moduli,int N_celle,int N_ntc){};
-       bool error_check(cell_asic bms_ic[]){};
-       bool carica(cell_asic bms_ic[]){};
+       Pacco(int N_moduli,int N_celle,int N_ntc);
+       bool error_check(cell_asic bms_ic[]);
+       bool carica(cell_asic bms_ic[]);
 };
 #endif

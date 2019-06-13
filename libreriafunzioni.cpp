@@ -1,10 +1,5 @@
 #include "libreriafunzioni.h"
-#include <Arduino.h>
-#include <stdint.h>
-#include "Linduino.h"
-#include "UserInterface.h"
-#include "ltc681x.h"
-#include "ltc6813.h"
+
 
 
 void shoutdown_error(uint8_t pinOut){
@@ -47,7 +42,7 @@ void gpio_measurment(cell_asic bms_ic[]){
 
 
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //legge la temperatura in gradi              //solo il pin passato             
-  gpio_measurment();                                                  //e l'IC passato
+  gpio_measurment(bms_ic);                                                  //e l'IC passato
   float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;
   float Vref2=bms_ic[current_ic].aux.a_codes[5]*0.0001;
   float Rntc = ((Resistenza * Vref2) / Vout) - Resistenza;
@@ -80,4 +75,15 @@ void open_relay(uint8_t relay){
 
 void close_relay(uint8_t relay){
   digitalWrite(relay, LOW);
+}
+
+void voltage_measurment(cell_asic bms_ic[]){
+  wakeup_sleep(TOTAL_IC);
+  ltc6813_adcv(ADC_CONVERSION_MODE, ADC_DCP, CELL_CH_TO_CONVERT);
+  uint8_t conv_time = ltc6813_pollAdc();
+  /*Serial.print(F("cell conversion completed in:"));
+  Serial.print(((float)conv_time / 1000), 1);
+  Serial.println(F("mS"));
+  Serial.println();*/
+  ltc6813_rdcv(0, TOTAL_IC, bms_ic); // Set to read back all cell voltage registers
 }

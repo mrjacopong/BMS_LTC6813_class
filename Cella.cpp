@@ -1,6 +1,4 @@
 #include "elementi.h"
-#include "ltc681x.h"
-#include <Arduino.h>
 #include "libreriafunzioni.h"
 
 Cella::Cella(){

@@ -1,17 +1,21 @@
 #ifndef LIBRERIAFUNZIONI_h
 #define LIBRERIAFUNZIONI_h
-#include <cmath>
-#include <stdint.h>
 #include "ltc6813.h"
 
+//ADC Command Configurations
+const uint8_t ADC_OPT = ADC_OPT_DISABLED; // See ltc6813_daisy.h for Options
 const uint8_t ADC_CONVERSION_MODE = MD_7KHZ_3KHZ;//MD_7KHZ_3KHZ; //MD_26HZ_2KHZ;//MD_7KHZ_3KHZ; // See ltc6813_daisy.h for Options
+const uint8_t ADC_DCP = DCP_DISABLED; // See ltc6813_daisy.h for Options
+const uint8_t CELL_CH_TO_CONVERT = CELL_CH_ALL; // See ltc6813_daisy.h for Options
 const uint8_t AUX_CH_TO_CONVERT = AUX_CH_ALL; // See ltc6813_daisy.h for Options
+const uint8_t STAT_CH_TO_CONVERT = STAT_CH_ALL; // See ltc6813_daisy.h for Options
+const uint16_t MEASUREMENT_LOOP_TIME = 500;//milliseconds(mS)
 
 //Under Voltage and Over Voltage Thresholds
 const uint16_t OV_THRESHOLD = 41000; // Over voltage threshold ADC Code. LSB = 0.0001
 const uint16_t UV_THRESHOLD = 30000; // Under voltage threshold ADC Code. LSB = 0.0001
 const uint16_t MAXTEMP = 60;         // Over temperature GRADI CENTIGRADI
-double MAXVOLTAGE = OV_THRESHOLD;    // per convertirla in double nella funzione error_check
+const double MAXVOLTAGE = OV_THRESHOLD;    // per convertirla in double nella funzione error_check
 const uint16_t OV_TIME_LIMIT=500;    // limite di tempo in millisecondi OV
 const uint16_t OT_TIME_LIMIT=1000;    // limite di tempo in millisecondi OT
 
@@ -24,22 +28,22 @@ const uint8_t unused_ch_2=18;//celle no nusate
 //per algoritmo di carica
 const uint16_t delta_carica = 2000;  // massima differenza tra due batterie in serie 
 const uint16_t SogliaCarica=41000;   // soglia tensione carica (4.0V)
-bool in_carica=true;                 // true->in carica ; false->non in carica;
-bool IsCharged=false;                //serve per controllare che stiamo caricando
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
 const uint8_t RelayPin=10;           //pin del relay da aprire in caso di errore
 const uint8_t ChargeSwitchPin=11;         //pin dello switch per avviare la carica
 /*--variabili per ntc--*/
-float AA1 = 3.354016 * pow(10, -3);
-float BB1 = 2.569850 * pow(10, -4);
-float CC1 = 2.620131 * pow(10, -6);
-float D1 = 6.383091 * pow(10, -8);
-float Resistenza = 10000;
+const float AA1 = 3.354016 * pow(10, -3);
+const float BB1 = 2.569850 * pow(10, -4);
+const float CC1 = 2.620131 * pow(10, -6);
+const float D1 = 6.383091 * pow(10, -8);
+const float Resistenza = 10000;
 
 
 
 /*Funzioni */
+float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
+void voltage_measurment(cell_asic bms_ic[]);
 void shoutdown_error(uint8_t pinOut);
 bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();
