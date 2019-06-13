@@ -1,10 +1,12 @@
 #ifndef ELEMENTI_h
 #define ELEMENTI_h
+#include "ltc681x.h"
+
 class Elemento{
     protected:
         bool flag_error;
     public:
-        virtual bool error_check()=0;
+        virtual bool error_check(cell_asic bms_ic[])=0;
 };
 
 class Ntc : public Elemento{
@@ -12,12 +14,12 @@ class Ntc : public Elemento{
         unsigned long tempo;
     public:
         Ntc();
-        bool error_check();
+        bool error_check(cell_asic bms_ic[]);
 };
 
 class Elemento_circuitale: public Elemento{
     public:
-        virtual bool carica()=0;
+        virtual bool carica(cell_asic bms_ic[])=0;
 };
 
 class Cella : public Elemento_circuitale{
@@ -25,8 +27,8 @@ class Cella : public Elemento_circuitale{
         unsigned long tempo;
     public:
         Cella();
-        bool error_check();
-        bool carica();
+        bool error_check(cell_asic bms_ic[]);
+        bool carica(cell_asic bms_ic[]);
 
 };
 
@@ -39,8 +41,8 @@ class Modulo: public Elemento_circuitale{
        int n_ntc;
     public :
        Modulo(int N_celle,int N_ntc){};
-       bool error_check(){};
-       bool carica(){};
+       bool error_check(cell_asic bms_ic[]){};
+       bool carica(cell_asic bms_ic[]){};
 };
 
 class Pacco: public Elemento_circuitale{
@@ -49,8 +51,9 @@ class Pacco: public Elemento_circuitale{
        Modulo** modulo;
        int n_moduli;
     public :
+       cell_asic bms_ic;
        Pacco(int N_moduli,int N_celle,int N_ntc){};
-       bool error_check(){};
-       bool carica(){};
+       bool error_check(cell_asic bms_ic[]){};
+       bool carica(cell_asic bms_ic[]){};
 };
 #endif

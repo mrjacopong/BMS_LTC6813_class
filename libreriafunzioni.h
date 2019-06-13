@@ -2,7 +2,18 @@
 #define LIBRERIAFUNZIONI_h
 #include <cmath>
 #include <stdint.h>
+#include "ltc6813.h"
 
+const uint8_t ADC_CONVERSION_MODE = MD_7KHZ_3KHZ;//MD_7KHZ_3KHZ; //MD_26HZ_2KHZ;//MD_7KHZ_3KHZ; // See ltc6813_daisy.h for Options
+const uint8_t AUX_CH_TO_CONVERT = AUX_CH_ALL; // See ltc6813_daisy.h for Options
+
+//Under Voltage and Over Voltage Thresholds
+const uint16_t OV_THRESHOLD = 41000; // Over voltage threshold ADC Code. LSB = 0.0001
+const uint16_t UV_THRESHOLD = 30000; // Under voltage threshold ADC Code. LSB = 0.0001
+const uint16_t MAXTEMP = 60;         // Over temperature GRADI CENTIGRADI
+double MAXVOLTAGE = OV_THRESHOLD;    // per convertirla in double nella funzione error_check
+const uint16_t OV_TIME_LIMIT=500;    // limite di tempo in millisecondi OV
+const uint16_t OT_TIME_LIMIT=1000;    // limite di tempo in millisecondi OT
 
 const uint8_t TOTAL_IC = 1;//!<number of ICs in the daisy chain
 const uint8_t TOTAL_CH = 18; // number of channel used per ADC
@@ -29,7 +40,6 @@ float Resistenza = 10000;
 
 
 /*Funzioni */
-
 void shoutdown_error(uint8_t pinOut);
 bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();

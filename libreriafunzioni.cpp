@@ -1,5 +1,11 @@
 #include "libreriafunzioni.h"
 #include <Arduino.h>
+#include <stdint.h>
+#include "Linduino.h"
+#include "UserInterface.h"
+#include "ltc681x.h"
+#include "ltc6813.h"
+
 
 void shoutdown_error(uint8_t pinOut){
   open_relay(pinOut);
@@ -30,7 +36,8 @@ void intermediate_balance(int8_t cella){
   set_discharge(cella);
 }
 
-void gpio_measurment(){
+
+void gpio_measurment(cell_asic bms_ic[]){
   wakeup_sleep(TOTAL_IC);                                             //converte gpio
   ltc6813_adax(ADC_CONVERSION_MODE , AUX_CH_TO_CONVERT);
   ltc6813_pollAdc();
@@ -39,7 +46,7 @@ void gpio_measurment(){
 }
 
 
-float ReadTempGrad (uint8_t pin,uint8_t current_ic){    //legge la temperatura in gradi              //solo il pin passato             
+float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //legge la temperatura in gradi              //solo il pin passato             
   gpio_measurment();                                                  //e l'IC passato
   float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;
   float Vref2=bms_ic[current_ic].aux.a_codes[5]*0.0001;
@@ -50,24 +57,17 @@ float ReadTempGrad (uint8_t pin,uint8_t current_ic){    //legge la temperatura i
   float C = CC1 * (pow(Peppa,2));
   float D = D1 * (pow(Peppa,3));
   float sum = AA1 + B + C + D;
-  /*--un po debug--*/
-  Serial.print("Rntc: ");
-  Serial.println(Rntc);
-  Serial.print("Vref2: ");
-  Serial.println(Vref2,4);
-  Serial.print("Vout: ");
-  Serial.println(Vout,4);
   float Temp = (pow(sum, -1)-274);
   return (Temp);
 }
-void set_discharge(int8_t cella){
+void set_discharge(int8_t cella,cell_asic bms_ic[]){
   ltc6813_set_discharge(cella,TOTAL_IC,bms_ic);
   wakeup_sleep(TOTAL_IC);
   ltc6813_wrcfg(TOTAL_IC,bms_ic);
   ltc6813_wrcfgb(TOTAL_IC,bms_ic);
 }
 
-void reset_discharge(){
+void reset_discharge(cell_asic bms_ic[]){
   clear_discharge(TOTAL_IC,bms_ic);
   wakeup_sleep(TOTAL_IC);
   ltc6813_wrcfg(TOTAL_IC,bms_ic);

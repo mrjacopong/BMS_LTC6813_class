@@ -1,19 +1,23 @@
 #include "elementi.h"
+#include "ltc681x.h"
 
 
 Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){
     flag_error=false;
+    n_moduli=N_moduli;
     modulo= new Modulo* [N_moduli];
     for (int i=0;i<N_moduli;i++){
     modulo[i] = new Modulo(N_celle,N_ntc);
     }
- 
+    cell_asic bms_ic;
 
 }
-bool Pacco::error_check(){
-
+bool Pacco::error_check(cell_asic bms_ic[]){
+    for (int i=0;i<n_moduli;i++){
+    modulo[i]->error_check(bms_ic);
+    }
 }
 
-bool Pacco::carica(){
+bool Pacco::carica(cell_asic bms_ic[]){
 
 }
