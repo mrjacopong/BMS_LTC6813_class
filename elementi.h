@@ -35,8 +35,10 @@ class Modulo: public Elemento_circuitale{
     protected:
        Cella** cella;
        Ntc** ntc;
+       int n_celle;
+       int n_ntc;
     public :
-       Modulo(int n_celle,int n_pacchi){};
+       Modulo(int N_celle,int N_ntc){};
        bool error_check(){};
        bool carica(){};
 };
@@ -45,8 +47,9 @@ class Pacco: public Elemento_circuitale{
 
     protected:
        Modulo** modulo;
+       int n_moduli;
     public :
-       Pacco(int n_moduli,int n_celle,int n_ntc){};
+       Pacco(int N_moduli,int N_celle,int N_ntc){};
        bool error_check(){};
        bool carica(){};
 };
