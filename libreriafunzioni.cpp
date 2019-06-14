@@ -1,6 +1,12 @@
 #include "libreriafunzioni.h"
 
 
+uint16_t IsTop(uint16_t top,uint16_t actual){                            //ritorna il valore più grande
+  if (top>actual){
+    return top;
+  }
+  return actual;
+}
 
 void shoutdown_error(uint8_t pinOut){
   open_relay(pinOut);

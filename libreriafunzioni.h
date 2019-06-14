@@ -42,6 +42,7 @@ const float Resistenza = 10000;
 
 
 /*Funzioni */
+uint16_t IsTop(uint16_t top,uint16_t actual);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
 void voltage_measurment(cell_asic bms_ic[]);
 void shoutdown_error(uint8_t pinOut);
