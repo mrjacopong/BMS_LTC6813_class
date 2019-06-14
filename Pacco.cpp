@@ -13,8 +13,10 @@ Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){
 }
 bool Pacco::error_check(cell_asic bms_ic[]){
     for (int i=0;i<n_moduli;i++){
-    modulo[i]->error_check(bms_ic);
+        if(modulo[i]->error_check(bms_ic,i)==true)
+            return true;
     }
+    return false;
 }
 
 bool Pacco::carica(cell_asic bms_ic[]){

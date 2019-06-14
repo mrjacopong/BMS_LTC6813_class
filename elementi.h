@@ -6,7 +6,7 @@ class Elemento{
     protected:
         bool flag_error;
     public:
-        virtual bool error_check(cell_asic bms_ic[])=0;
+        //virtual bool error_check()=0;
 };
 
 class Ntc : public Elemento{
@@ -14,7 +14,7 @@ class Ntc : public Elemento{
         unsigned long tempo;
     public:
         Ntc();
-        bool error_check(cell_asic bms_ic[]);
+        bool error_check(uint16_t temperatura);
 };
 
 class Elemento_circuitale: public Elemento{
@@ -27,7 +27,7 @@ class Cella : public Elemento_circuitale{
         unsigned long tempo;
     public:
         Cella();
-        bool error_check(cell_asic bms_ic[]);
+        bool error_check(uint16_t tensione);
         bool carica(cell_asic bms_ic[]);
 
 };
@@ -41,7 +41,7 @@ class Modulo: public Elemento_circuitale{
        int n_ntc;
     public :
        Modulo(int N_celle,int N_ntc);
-       bool error_check(cell_asic bms_ic[]);
+       bool error_check(cell_asic bms_ic[],int modulo_corrente);
        bool carica(cell_asic bms_ic[]);
 };
 
