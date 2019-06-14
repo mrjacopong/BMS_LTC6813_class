@@ -24,5 +24,8 @@ bool Modulo::error_check(cell_asic bms_ic[]){
 }
 
 bool Modulo::carica(cell_asic bms_ic[]){
+    for (int i=0;i<n_celle;i++){
+    cella[i]->carica(bms_ic);
+    }
 
 }

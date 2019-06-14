@@ -33,5 +33,39 @@ bool Cella::error_check(cell_asic bms_ic[]){
 }
 
 bool Cella::carica(cell_asic bms_ic[]){
+    uint8_t top_voltage[TOTAL_IC];
+  bool modulo_carico=0;
+  uint8_t numero_moduli_carichi=0;
+
+  for (uint8_t current_ic = 0; current_ic < TOTAL_IC; current_ic++) {
+    modulo_carico=true;
+    /* true-> tutte cariche */
+    /* false-> non tutte cariche */
+    for (uint8_t current_ch = 0; current_ch < TOTAL_CH; current_ch++) {
+      if ((current_ch == unused_ch_1)||(current_ch == unused_ch_2)) {}//le trascuro
+      /*aggiorno la tensione massima per ogni IC*/
+      top_voltage[current_ic]=IsTop(top_voltage[current_ic],bms_ic[current_ic].cells.c_codes[current_ch]);
+      /*controllo se la cella non è carica*/
+      if(bms_ic[current_ic].cells.c_codes[current_ch] < SogliaCarica){
+        modulo_carico=false;                                        //se le celle sono tutte cariche
+      }                                                             // allora la variabile rimane true  
+      else{
+        numero_moduli_carichi++;
+        /*bilanciamento finale*/
+      }
+      if(bms_ic[current_ic].cells.c_codes[current_ch]-top_voltage[current_ic]>delta_carica){
+        intermediate_balance(current_ch);
+        if(bms_ic[current_ic].cells.c_codes[current_ch]-top_voltage[current_ic]>delta_carica+0.2){
+          /*bilanciamento intermedio ma più potente*/
+          /*ferma la carica e bilancia*/
+          greater_balance(current_ch,RelayPin);
+        }
+      }
+    }
+  }
+  if(numero_moduli_carichi==TOTAL_IC){
+    return stop_charge(RelayPin);
+  }
+  return true;
 
 }
