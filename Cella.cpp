@@ -26,7 +26,7 @@ bool Cella::error_check(uint16_t tensione){
     return false;
 }
 
-bool Cella::carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage){
+bool Cella::carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage,int cella_corrente){
     bool modulo_carico=0;
     uint8_t numero_moduli_carichi=0;
 
@@ -45,11 +45,11 @@ bool Cella::carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage){
         /*bilanciamento finale*/
       }
       if(tensione-top_voltage>delta_carica){
-        intermediate_balance(current_ch,bms_ic);
+        intermediate_balance(cella_corrente,bms_ic);
         if(tensione-top_voltage>delta_carica+0.2){
           /*bilanciamento intermedio ma più potente*/
           /*ferma la carica e bilancia*/
-          greater_balance(current_ch,RelayPin,bms_ic);
+          greater_balance(cella_corrente,RelayPin,bms_ic);
         }
       }
   if(numero_moduli_carichi==TOTAL_IC){

@@ -28,7 +28,7 @@ class Cella : public Elemento_circuitale{
     public:
         Cella();
         bool error_check(uint16_t tensione);
-        bool carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage);
+        bool carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage,int cella_corrente);
 
 };
 
