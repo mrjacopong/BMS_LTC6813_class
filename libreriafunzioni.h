@@ -49,12 +49,12 @@ void shoutdown_error(uint8_t pinOut);
 bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();
 bool stop_charge(uint8_t pinOut);
-void greater_balance(int8_t cella,uint8_t pinOut);
-void intermediate_balance(int8_t cella);
-void gpio_measurment();
+void greater_balance(int8_t cella,uint8_t pinOut,cell_asic bms_ic[]);
+void intermediate_balance(int8_t cella,cell_asic bms_ic[]);
+void gpio_measurment(cell_asic bms_ic[]);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic);
-void set_discharge(int8_t cella);
-void reset_discharge();
+void set_discharge(int8_t cella,cell_asic bms_ic[]);
+void reset_discharge(cell_asic bms_ic[]);
 void open_relay(uint8_t relay);
 void close_relay(uint8_t relay);
 

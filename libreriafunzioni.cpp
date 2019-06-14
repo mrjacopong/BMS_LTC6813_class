@@ -28,13 +28,13 @@ bool stop_charge(uint8_t pinOut){  //ferma la carica
   return true;
 }
 
-void greater_balance(int8_t cella,uint8_t pinOut){
+void greater_balance(int8_t cella,uint8_t pinOut,cell_asic bms_ic[]){
   open_relay(pinOut);
-  set_discharge(cella);
+  set_discharge(cella,bms_ic);
 }
 
-void intermediate_balance(int8_t cella){
-  set_discharge(cella);
+void intermediate_balance(int8_t cella,cell_asic bms_ic[]){
+  set_discharge(cella,bms_ic);
 }
 
 

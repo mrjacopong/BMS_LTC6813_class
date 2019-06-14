@@ -48,11 +48,11 @@ bool Cella::carica(cell_asic bms_ic[]){
         /*bilanciamento finale*/
       }
       if(bms_ic[current_ic].cells.c_codes[current_ch]-top_voltage[current_ic]>delta_carica){
-        intermediate_balance(current_ch);
+        intermediate_balance(current_ch,bms_ic);
         if(bms_ic[current_ic].cells.c_codes[current_ch]-top_voltage[current_ic]>delta_carica+0.2){
           /*bilanciamento intermedio ma più potente*/
           /*ferma la carica e bilancia*/
-          greater_balance(current_ch,RelayPin);
+          greater_balance(current_ch,RelayPin,bms_ic);
         }
       }
     }

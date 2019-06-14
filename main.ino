@@ -126,7 +126,7 @@ bool IsCharged=false;                //serve per controllare che stiamo caricand
  ******************************************************/
 
 cell_asic bms_ic[TOTAL_IC];                   //array di tensioni
-Pacco pacco(1,16,1);
+Pacco pacco(1,16,1);                          //array di ogetti
 /*!**********************************************************************
   \brief  Inititializes hardware and variables
  ***********************************************************************/
@@ -160,14 +160,16 @@ void loop(){
   
    //---------------------------------//
     voltage_measurment(bms_ic);             //leggo le tensioni dall'adc
-    pacco.error_check(bms_ic);              //controllo degli errori e scrittura della matrice di errori
-    
+    gpio_measurment(bms_ic);                //leggo le temperature dall'adc
+    if(pacco.error_check(bms_ic))           //controllo degli errori
+      shoutdown_error(RelayPin);            //e spengo tutto se c'è un errore
    
     
     while (ChargeSwitch==HIGH && !IsCharged) {
       close_relay(RelayPin);
       voltage_measurment(bms_ic);
       if (pacco.error_check(bms_ic)) {      //se c'è un errore evito di tornare in questo ciclo
+        shoutdown_error(RelayPin);
         IsCharged=true;
         break;
       }
