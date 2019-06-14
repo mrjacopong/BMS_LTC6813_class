@@ -21,7 +21,7 @@ bool Pacco::error_check(cell_asic bms_ic[]){
 
 bool Pacco::carica(cell_asic bms_ic[]){
     for (int i=0;i<n_moduli;i++){
-    modulo[i]->carica(bms_ic);
+    modulo[i]->carica(bms_ic,i);
     }
 
 }
