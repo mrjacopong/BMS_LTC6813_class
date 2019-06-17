@@ -26,14 +26,14 @@ bool Pacco::carica(cell_asic bms_ic[]){
 
 }
 
-void StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale di arduino
+void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale di arduino
     for (int i=0;i<n_moduli;i++){
             Serial.println("modulo"+i+":");
             StampaVoltaggio (cell_asic bms_ic[],i);
         }
 }
 
-void StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di arduino 
+void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di arduino 
     for (int i=0;i<n_moduli;i++){
             Serial.println("modulo"+i+":");
             StampaTemp (cell_asic bms_ic[],i);
