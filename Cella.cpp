@@ -26,35 +26,19 @@ bool Cella::error_check(uint16_t tensione){
     return false;
 }
 
-bool Cella::carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage,int cella_corrente){
-    bool modulo_carico=0;
-    uint8_t numero_moduli_carichi=0;
-
-  //for (uint8_t current_ic = 0; current_ic < TOTAL_IC; current_ic++) {
-    //modulo_carico=true;
-    /* true-> tutte cariche */
-    /* false-> non tutte cariche */
-   // for (uint8_t current_ch = 0; current_ch < TOTAL_CH; current_ch++) {
-      /*aggiorno la tensione massima per ogni IC*/
-      /*controllo se la cella non è carica*/
-      if( tensione < SogliaCarica){
-        modulo_carico=false;                                        //se le celle sono tutte cariche
-      }                                                             // allora la variabile rimane true  
-      else{
-        numero_moduli_carichi++;
-        /*bilanciamento finale*/
-      }
-      if(tensione-top_voltage>delta_carica){
-        intermediate_balance(cella_corrente,bms_ic);
-        if(tensione-top_voltage>delta_carica+0.2){
-          /*bilanciamento intermedio ma più potente*/
-          /*ferma la carica e bilancia*/
-          greater_balance(cella_corrente,RelayPin,bms_ic);
-        }
-      }
-  if(numero_moduli_carichi==TOTAL_IC){
-    return stop_charge(RelayPin);
+bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente){
+  /*controllo se la cella è carica*/
+  if( tensione >= SogliaCarica){
+      final_balance(tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
+    return true;  //true -> la cella è carica
   }
-  return true;
-
+  if(tensione-top_voltage>delta_carica+delta_carica){
+    /*bilanciamento intermedio ma più potente*/
+    /*ferma la carica e bilancia*/
+    greater_balance(tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
+  }
+  if(top_voltage-tensione>delta_carica){
+    intermediate_balance(cella_corrente,bms_ic);
+  }
+  return false;                   //ritonra false -> vuol dire che la cella non è carica
 }

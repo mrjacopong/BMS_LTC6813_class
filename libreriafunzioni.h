@@ -27,7 +27,7 @@ const uint8_t unused_ch_2=18;//celle no nusate
 
 //per algoritmo di carica
 const uint16_t delta_carica = 2000;  // massima differenza tra due batterie in serie 
-const uint16_t SogliaCarica=41000;   // soglia tensione carica (4.0V)
+const uint16_t SogliaCarica=40000;   // soglia tensione carica (4.0V)
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
 const uint8_t RelayPin=10;           //pin del relay da aprire in caso di errore
@@ -49,7 +49,8 @@ void shoutdown_error(uint8_t pinOut);
 bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();
 bool stop_charge(uint8_t pinOut);
-void greater_balance(int8_t cella,uint8_t pinOut,cell_asic bms_ic[]);
+void final_balance(uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella);
+void greater_balance(uint16_t tensoine_iniziale,uint8_t pinOut,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]);
 void gpio_measurment(cell_asic bms_ic[]);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic);

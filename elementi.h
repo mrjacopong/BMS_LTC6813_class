@@ -6,7 +6,7 @@
     protected:
         bool flag_error;
     public:
-        virtual bool error_check() const;
+        // virtual bool error_check() const;
 };
 
 class Ntc : public Elemento{
@@ -19,7 +19,7 @@ class Ntc : public Elemento{
 
 class Elemento_circuitale: public Elemento{
     public:
-        virtual bool carica() const;
+       // virtual bool carica() const;
 };
 
 class Cella : public Elemento_circuitale{
@@ -28,13 +28,15 @@ class Cella : public Elemento_circuitale{
     public:
         Cella();
         bool error_check(uint16_t tensione);
-        bool carica(uint8_t tensione,cell_asic bms_ic[],uint16_t top_voltage,int cella_corrente);
+        bool carica(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente);
 
 };
 
 class Modulo: public Elemento_circuitale{
 
     protected:
+       uint16_t top_voltage;
+       bool modulo_carico;
        Cella** cella;
        Ntc** ntc;
        int n_celle;

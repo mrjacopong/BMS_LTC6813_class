@@ -29,9 +29,22 @@ bool stop_charge(uint8_t pinOut){  //ferma la carica
   return true;
 }
 
-void greater_balance(int8_t cella,uint8_t pinOut,cell_asic bms_ic[]){
+void final_balance(uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella){
+  if (tensione >= SogliaCarica + 500)
+    intermediate_balance(cella,bms_ic);
+  if (tensione >= SogliaCarica + 900)
+    greater_balance(tensione,RelayPin,bms_ic,modulo,cella);
+  /*voglio che se la batteria sia a 4,05V va bene
+  se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */
+}
+
+void greater_balance(uint16_t tensoine_iniziale,uint8_t pinOut,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
   open_relay(pinOut);
-  set_discharge(cella,bms_ic);
+  while (tensoine_iniziale - bms_ic[modulo].cells.c_codes[cella] >= delta_carica){
+    set_discharge(cella,bms_ic);
+    voltage_measurment(bms_ic);
+  } //finquando la tensione attuale non si abbassa di un delta definito da noi non esce dal ciclo
+  close_relay(pinOut);
 }
 
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]){
@@ -63,6 +76,8 @@ float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //leg
   return (Temp);
 }
 void set_discharge(int8_t cella,cell_asic bms_ic[]){
+  /*da testare quando acremo più moduli,non attiva ora perchè bisognerebbe modificare alcune librerie */
+  //ltc6813_set_discharge(cella,modulo,bms_ic);
   ltc6813_set_discharge(cella,TOTAL_IC,bms_ic);
   wakeup_sleep(TOTAL_IC);
   ltc6813_wrcfg(TOTAL_IC,bms_ic);
