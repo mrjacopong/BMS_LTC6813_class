@@ -24,4 +24,23 @@ bool Pacco::carica(cell_asic bms_ic[]){
     if(modulo[i]->carica(bms_ic,i)) //true se carica
         stop_charge(RelayPin);      //stoppa la carica del modulo in queestione
     }
+
+}
+
+void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale di arduino
+    for (int i=0;i<n_moduli;i++){
+            Serial.print("modulo");
+            Serial.print(i);
+            Serial.println(":");
+            modulo[i]->StampaVoltaggio (bms_ic,i);
+        }
+}
+
+void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di arduino 
+    for (int i=0;i<n_moduli;i++){
+            Serial.print("modulo");
+            Serial.print(i);
+            Serial.println(":");
+            modulo[i]->StampaTemp (bms_ic,i);
+        }
 }
