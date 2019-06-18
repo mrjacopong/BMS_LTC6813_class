@@ -5,25 +5,18 @@
  class Elemento{
     protected:
         bool flag_error;
-    public:
-        // virtual bool error_check() const;
 };
 
 class Ntc : public Elemento{
-    protected:
+    private:
         unsigned long tempo;
     public:
         Ntc();
         bool error_check(uint16_t temperatura);
 };
 
-class Elemento_circuitale: public Elemento{
-    public:
-       // virtual bool carica() const;
-};
-
-class Cella : public Elemento_circuitale{
-    protected:
+class Cella : public Elemento{
+    private:
         unsigned long tempo;
     public:
         Cella();
@@ -32,9 +25,9 @@ class Cella : public Elemento_circuitale{
 
 };
 
-class Modulo: public Elemento_circuitale{
+class Modulo: public Elemento{
 
-    protected:
+    private:
        uint16_t top_voltage;
        bool modulo_carico;
        Cella** cella;
@@ -50,9 +43,9 @@ class Modulo: public Elemento_circuitale{
 
 };
 
-class Pacco: public Elemento_circuitale{
+class Pacco: public Elemento{
 
-    protected:
+    private:
        Modulo** modulo;
        int n_moduli;
     public :
