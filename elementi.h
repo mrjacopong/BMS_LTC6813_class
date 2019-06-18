@@ -23,7 +23,7 @@ class Elemento_circuitale: public Elemento{
 };
 
 class Cella : public Elemento_circuitale{
-    protected:
+    private:
         unsigned long tempo;
     public:
         Cella();
@@ -34,7 +34,7 @@ class Cella : public Elemento_circuitale{
 
 class Modulo: public Elemento_circuitale{
 
-    protected:
+    private:
        uint16_t top_voltage;
        bool modulo_carico;
        Cella** cella;
@@ -52,7 +52,7 @@ class Modulo: public Elemento_circuitale{
 
 class Pacco: public Elemento_circuitale{
 
-    protected:
+    private:
        Modulo** modulo;
        int n_moduli;
     public :
