@@ -2,6 +2,7 @@
 
 
 
+
 uint16_t IsTop(uint16_t top,uint16_t actual){                            //ritorna il valore più grande
   if (top>actual){
     return top;
@@ -23,6 +24,10 @@ bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se 
 void init_pinout(){ //inizzializza il pinout per l'arduino
   pinMode(RelayPin,OUTPUT);
   pinMode(ChargeSwitchPin,INPUT);
+  pinMode(LedErrore,OUTPUT);
+  pinMode(LedSistema,OUTPUT);
+  pinMode(LedCarica,OUTPUT);
+  pinMode(LedBilanciamentoPesante,OUTPUT);
 }
 bool stop_charge(uint8_t pinOut){  //ferma la carica 
   open_relay(pinOut);
@@ -125,4 +130,21 @@ void StampaHeaderTabella(){
   Serial.print("in carica;");
   Serial.print("carica completata");
   Serial.println();
+}
+
+void AccendiLed(int Pin){
+    digitalWrite(Pin,HIGH);    
+}
+
+void SpegniLed(int Pin){
+    digitalWrite(Pin,LOW);
+}
+
+unsigned long Blink(int Pin,unsigned long LastMillisLed){
+  if(millis() - LastMillisLed > intervalloBlink) {
+    LastMillisLed = millis(); //save the last time you blinked the LED
+    //if the LED is off turn it on and vice-versa:
+    digitalWrite(Pin, !digitalRead(Pin));
+  }
+  return LastMillisLed;
 }

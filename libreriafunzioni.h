@@ -1,6 +1,17 @@
 #ifndef LIBRERIAFUNZIONI_h
 #define LIBRERIAFUNZIONI_h
+
+
+#define LedBilanciamentoPesante 7           //Definisco i pin dei led e del relè
+#define LedSistema 4
+#define LedCarica 5
+#define LedErrore 3
+#define RelayPin 6
+#define ChargeSwitchPin 2
+
 #include "ltc6813.h"
+
+const unsigned long intervalloBlink = 200;  //Parametri per la stampa 
 
 //ADC Command Configurations
 const uint8_t ADC_OPT = ADC_OPT_DISABLED; // See ltc6813_daisy.h for Options
@@ -32,8 +43,6 @@ const uint16_t delta_carica = 2000;  // massima differenza tra due batterie in s
 const uint16_t SogliaCarica=40000;   // soglia tensione carica (4.0V)
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
-const uint8_t RelayPin=10;           //pin del relay da aprire in caso di errore
-const uint8_t ChargeSwitchPin=11;         //pin dello switch per avviare la carica
 /*--variabili per ntc--*/
 const float AA1 = 3.354016 * pow(10, -3);
 const float BB1 = 2.569850 * pow(10, -4);
@@ -61,6 +70,9 @@ void reset_discharge(cell_asic bms_ic[]);
 void open_relay(uint8_t relay);
 void close_relay(uint8_t relay);
 void StampaHeaderTabella();
+void AccendiLed(int Pin);
+void SpegniLed(int Pin);
+unsigned long Blink(int Pin,unsigned long LastMillisLed);
 
 
 
