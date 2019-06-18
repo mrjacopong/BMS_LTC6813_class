@@ -109,3 +109,20 @@ void voltage_measurment(cell_asic bms_ic[]){
   Serial.println();*/
   ltc6813_rdcv(0, TOTAL_IC, bms_ic); // Set to read back all cell voltage registers
 }
+
+void StampaHeaderTabella(){
+  Serial.print("Tempo;");
+  for (int i=0; i<CelleUsate; i++){
+    Serial.print("cella ");
+    Serial.print(i);
+    Serial.print(";");
+  }
+  for (int i=0; i<NtcUsati; i++){
+    Serial.print("ntc ");
+    Serial.print(i);
+    Serial.print(";");
+  }
+  Serial.print("in carica;");
+  Serial.print("carica completata");
+  Serial.println();
+}

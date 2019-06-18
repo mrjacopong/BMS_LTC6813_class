@@ -55,6 +55,6 @@ class Pacco: public Elemento{
        bool carica(cell_asic bms_ic[]);
        void StampaVoltaggio (cell_asic bms_ic[]);  //stampa nel monitor seriale di arduino il volt di tutte le celle del pacco
        void StampaTemp (cell_asic bms_ic[]);         //stampa nel monitor seriale di arduino la temperatura di tutti gli ntc del pacco   
-
+       void StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompleta);
 };
 #endif

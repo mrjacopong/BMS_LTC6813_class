@@ -95,7 +95,7 @@ FUNCTION-> int8_t spi_read(int8_t  data) :183
 #define DATALOG_ENABLED 1
 #define DATALOG_DISABLED 0
 
-
+unsigned long TempoPrec=0;
 char get_char();
 void print_menu();
 void read_config_data(uint8_t cfg_data[][6], uint8_t nIC);
@@ -143,6 +143,7 @@ void setup()
   ltc6813_reset_crc_count(TOTAL_IC, bms_ic);
   ltc6813_init_reg_limits(TOTAL_IC, bms_ic);
   //  init_pinout();
+  StampaHeaderTabella();
 }
 
 void loop(){
@@ -151,9 +152,10 @@ void loop(){
   uint8_t user_command;
   uint8_t readIC = 0;
   char input = 0;
-  uint8_t ChargeSwitch=digitalRead (ChargeSwitchPin);
+  bool ChargeSwitch=digitalRead (ChargeSwitchPin);
   //--interfaccia utente temporanea--//
-  if (Serial.available()){           // Check for user input
+  //if (Serial.available()){           // Check for user input
+  if(false){
     uint8_t user_command;
     Serial.println("inserisci un numero qualsiasi per lanciare il programma");
     user_command = read_int();      // whait for a key
@@ -191,6 +193,9 @@ void loop(){
     Serial.println(ReadTempGrad (3,0,bms_ic));//0 sarebbe il prmio IC
 
     /*debug*/
-
+  if(millis()-TempoPrec>3000){
+    TempoPrec=millis();
+    pacco.StampaDebug(bms_ic, IsCharged, ChargeSwitch);
   }
+ }
 }

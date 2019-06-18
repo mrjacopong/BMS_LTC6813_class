@@ -22,8 +22,10 @@ const uint16_t OT_TIME_LIMIT=1000;    // limite di tempo in millisecondi OT
 const uint8_t TOTAL_IC = 1;//!<number of ICs in the daisy chain
 const uint8_t TOTAL_CH = 18; // number of channel used per ADC
 const uint8_t TOTAL_NTC = 8; // number of temperatures per ADC
-const uint8_t unused_ch_1=9;//celle non usate
-const uint8_t unused_ch_2=18;//celle no nusate
+const uint8_t unused_ch_1=9-1;//celle non usate
+const uint8_t unused_ch_2=18-1;//celle non nusate
+const uint8_t CelleUsate=16;
+const uint8_t NtcUsati=1;
 
 //per algoritmo di carica
 const uint16_t delta_carica = 2000;  // massima differenza tra due batterie in serie 
@@ -58,6 +60,7 @@ void set_discharge(int8_t cella,cell_asic bms_ic[]);
 void reset_discharge(cell_asic bms_ic[]);
 void open_relay(uint8_t relay);
 void close_relay(uint8_t relay);
+void StampaHeaderTabella();
 
 
 
