@@ -15,16 +15,7 @@ class Ntc : public Elemento{
         bool error_check(uint16_t temperatura);
 };
 
-<<<<<<< HEAD
-class Elemento_circuitale: public Elemento{
-    public:
-       // virtual bool carica() const;
-};
-
-class Cella : public Elemento_circuitale{
-=======
 class Cella : public Elemento{
->>>>>>> efb7350584702da9e015521cd23d8ebaf09c9c7c
     private:
         unsigned long tempo;
     public:
