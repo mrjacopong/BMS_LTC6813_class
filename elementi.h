@@ -3,8 +3,10 @@
 #include "ltc681x.h"
 
  class Elemento{
-    protected:
+    protected: 
         bool flag_error;
+    public:
+        virtual bool get_flag()=0;
 };
 
 class Ntc : public Elemento{
@@ -13,6 +15,8 @@ class Ntc : public Elemento{
     public:
         Ntc();
         bool error_check(uint16_t temperatura);
+        bool get_flag();
+        unsigned long get_tempo();
 };
 
 class Cella : public Elemento{
@@ -22,7 +26,8 @@ class Cella : public Elemento{
         Cella();
         bool error_check(uint16_t tensione);
         bool carica(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente);
-
+        bool get_flag();
+        unsigned long get_tempo();
 };
 
 class Modulo: public Elemento{
@@ -40,6 +45,11 @@ class Modulo: public Elemento{
        bool carica(cell_asic bms_ic[],int modulo_corrente);
        void StampaVoltaggio (cell_asic bms_ic[], int modulo_corrente);   //stampa nel monitor seriale di arduino i volt di tutte le celle del modulo
        void StampaTemp (cell_asic bms_ic[], int modulo_corrente);        //stampa nel monitor seriale di arduino le temperature di tutti gli ntc del modulo
+       bool get_flag();
+       uint16_t get_lowvoltage();
+       bool get_modulocarico();
+       int get_Ncelle();
+       int get_Nntc();
 
 };
 
@@ -56,5 +66,7 @@ class Pacco: public Elemento{
        void StampaVoltaggio (cell_asic bms_ic[]);  //stampa nel monitor seriale di arduino il volt di tutte le celle del pacco
        void StampaTemp (cell_asic bms_ic[]);         //stampa nel monitor seriale di arduino la temperatura di tutti gli ntc del pacco   
        void StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompleta);
+       bool get_flag();
+       int get_nModuli();
 };
 #endif

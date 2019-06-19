@@ -4,6 +4,7 @@
 Modulo::Modulo(int N_celle,int N_ntc){
     flag_error=false;
     low_voltage=60000;
+    modulo_carico=false;
     n_celle=N_celle;
     n_ntc=N_ntc;
     cella= new Cella* [N_celle];
@@ -64,3 +65,25 @@ void Modulo::StampaTemp (cell_asic bms_ic[],int modulo_corrente){   //stampa nel
         }
     }
 }
+
+bool Modulo::get_flag(){
+  return flag_error;
+}
+
+bool Modulo::get_modulocarico(){
+    return  modulo_carico;
+}
+
+
+int Modulo::get_Ncelle(){
+    return n_celle;  
+}
+
+int Modulo::get_Nntc(){
+    return n_ntc;
+}
+
+uint16_t Modulo::get_lowvoltage(){
+    return low_voltage;
+}
+

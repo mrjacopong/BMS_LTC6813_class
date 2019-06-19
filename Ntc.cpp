@@ -2,7 +2,7 @@
 #include "libreriafunzioni.h"
 Ntc::Ntc(){
     tempo=0;
-    flag_error=0;
+    flag_error=false;
 }
 
 bool Ntc::error_check(uint16_t temperatura){
@@ -22,4 +22,12 @@ bool Ntc::error_check(uint16_t temperatura){
       }
     else flag_error=false;            //in asssenza di error_OV il flag è diasttivato
   return false;
+}
+
+bool Ntc::get_flag(){
+  return flag_error;
+}
+
+unsigned long Ntc::get_tempo(){
+  return tempo;
 }

@@ -73,3 +73,12 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata
 
     Serial.println();
 }
+
+bool Pacco::get_flag(){
+  return flag_error;
+}
+
+int Pacco::get_nModuli(){
+    return n_moduli;
+}
+

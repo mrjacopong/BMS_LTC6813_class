@@ -3,7 +3,7 @@
 
 Cella::Cella(){
     tempo=0;
-    flag_error=0;
+    flag_error=false;
 }
 
 bool Cella::error_check(uint16_t tensione){
@@ -43,4 +43,13 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
     //intermediate_balance(cella_corrente,bms_ic);
   }
   return false;                   //ritonra false -> vuol dire che la cella non è carica
+}
+
+
+bool Cella::get_flag(){
+  return flag_error;
+}
+
+unsigned long Cella::get_tempo(){
+  return tempo;
 }
