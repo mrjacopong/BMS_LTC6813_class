@@ -28,7 +28,7 @@ class Cella : public Elemento{
 class Modulo: public Elemento{
 
     private:
-       uint16_t top_voltage;
+       uint16_t low_voltage;
        bool modulo_carico;
        Cella** cella;
        Ntc** ntc;

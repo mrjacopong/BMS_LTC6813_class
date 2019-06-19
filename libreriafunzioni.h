@@ -33,7 +33,7 @@ const uint16_t OT_TIME_LIMIT=1000;    // limite di tempo in millisecondi OT
 const uint8_t TOTAL_IC = 1;//!<number of ICs in the daisy chain
 const uint8_t TOTAL_CH = 18; // number of channel used per ADC
 const uint8_t TOTAL_NTC = 8; // number of temperatures per ADC
-const uint8_t unused_ch_1=9-1;//celle non usate
+const uint8_t unused_ch_1=13-1;//celle non usate
 const uint8_t unused_ch_2=18-1;//celle non nusate
 const uint8_t CelleUsate=16;
 const uint8_t NtcUsati=1;
@@ -54,14 +54,15 @@ const float Resistenza = 10000;
 
 /*Funzioni */
 uint16_t IsTop(uint16_t top,uint16_t actual);
+uint16_t IsLow(uint16_t low,uint16_t actual);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
 void voltage_measurment(cell_asic bms_ic[]);
-void shoutdown_error(uint8_t pinOut);
+void shoutdown_error();
 bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();
 bool stop_charge(uint8_t pinOut);
-void final_balance(uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella);
-void greater_balance(uint16_t tensoine_iniziale,uint8_t pinOut,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
+void final_balance(uint16_t Low_voltage,uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella);
+void greater_balance(uint16_t tensoine_iniziale,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]);
 void gpio_measurment(cell_asic bms_ic[]);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic);
@@ -73,7 +74,7 @@ void StampaHeaderTabella();
 void AccendiLed(int Pin);
 void SpegniLed(int Pin);
 unsigned long Blink(int Pin,unsigned long LastMillisLed);
-
+void StampaDebug2(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata);
 
 
 

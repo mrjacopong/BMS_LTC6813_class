@@ -18,7 +18,7 @@ bool Cella::error_check(uint16_t tensione){
     questo avviene nell'else*/
     else{
         if(time_check(tempo, OT_TIME_LIMIT))
-            shoutdown_error(RelayPin); 
+            shoutdown_error(); 
             return true;
         }
     }
@@ -27,19 +27,20 @@ bool Cella::error_check(uint16_t tensione){
     return false;
 }
 
-bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente){
+bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente){
   /*controllo se la cella è carica*/
   if( tensione >= SogliaCarica){
-      final_balance(tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
+      final_balance(low_voltage,tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
     return true;  //true -> la cella è carica
   }
-  if(tensione-top_voltage>delta_carica+delta_carica){
+  if(tensione-low_voltage>delta_carica+delta_carica){
     /*bilanciamento intermedio ma più potente*/
     /*ferma la carica e bilancia*/
-    greater_balance(tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
+    greater_balance(low_voltage,bms_ic, modulo_corrente, cella_corrente);
   }
-  if(top_voltage-tensione>delta_carica){
-    intermediate_balance(cella_corrente,bms_ic);
+  if(low_voltage-tensione>delta_carica){
+    
+    //intermediate_balance(cella_corrente,bms_ic);
   }
   return false;                   //ritonra false -> vuol dire che la cella non è carica
 }

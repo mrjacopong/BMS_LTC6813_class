@@ -2,16 +2,21 @@
 
 
 
-
 uint16_t IsTop(uint16_t top,uint16_t actual){                            //ritorna il valore più grande
   if (top>actual){
     return top;
   }
   return actual;
 }
+uint16_t IsLow(uint16_t low,uint16_t actual){                            //ritorna il valore più grande
+  if (low<actual){
+    return low;
+  }
+  return actual;
+}
 
-void shoutdown_error(uint8_t pinOut){
-  open_relay(pinOut);
+void shoutdown_error(){
+  open_relay(RelayPin);
   AccendiLed(LedErrore);
 }
 bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se l'errore persiste
@@ -24,6 +29,7 @@ bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se 
 
 void init_pinout(){ //inizzializza il pinout per l'arduino
   pinMode(RelayPin,OUTPUT);
+  digitalWrite(RelayPin, HIGH);
   pinMode(ChargeSwitchPin,INPUT);
   pinMode(LedErrore,OUTPUT);
   pinMode(LedSistema,OUTPUT);
@@ -35,25 +41,35 @@ bool stop_charge(uint8_t pinOut){  //ferma la carica
   return true;
 }
 
-void final_balance(uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella){
+void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella){
   if (tensione >= SogliaCarica + 500)
     intermediate_balance(cella,bms_ic);
-  if (tensione >= SogliaCarica + 900)
-    greater_balance(tensione,RelayPin,bms_ic,modulo,cella);
+  if (tensione >= SogliaCarica + 900){
+    greater_balance(Low_voltage,bms_ic,modulo,cella);
+  }
   /*voglio che se la batteria sia a 4,05V va bene
   se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */
 }
 
-void greater_balance(uint16_t tensoine_iniziale,uint8_t pinOut,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
-  open_relay(pinOut);
+void greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
+  open_relay(RelayPin);
   AccendiLed(LedBilanciamentoPesante);
-  while (tensoine_iniziale - bms_ic[modulo].cells.c_codes[cella] >= delta_carica){
-    set_discharge(cella,bms_ic);
+  unsigned long TempoPrec=0;
+  while (Low_voltage - bms_ic[modulo].cells.c_codes[cella] >= delta_carica && digitalRead(ChargeSwitchPin)){
+    set_discharge(cella+1,bms_ic);
     voltage_measurment(bms_ic);
-  } //finquando la tensione attuale non si abbassa di un delta definito da noi non esce dal ciclo
-  close_relay(pinOut);
+    
+    if(millis()-TempoPrec>3000){//lo rimetto qui altrimenti nel whilw non stampa più
+      TempoPrec=millis();
+      StampaDebug2(bms_ic, false, true);
+    }
+  delay(100);
+  }//finquando la tensione attuale non si abbassa di un delta definito da noi non esce dal ciclo
+  reset_discharge(bms_ic);
+  close_relay(RelayPin);
   SpegniLed(LedBilanciamentoPesante);
 }
+
 
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]){
   set_discharge(cella,bms_ic);
@@ -100,11 +116,11 @@ void reset_discharge(cell_asic bms_ic[]){
 }
 
 void open_relay(uint8_t relay){
-  digitalWrite(relay, HIGH);
+  digitalWrite(relay, LOW);
 }
 
 void close_relay(uint8_t relay){
-  digitalWrite(relay, LOW);
+  digitalWrite(relay, HIGH);
 }
 
 void voltage_measurment(cell_asic bms_ic[]){
@@ -150,4 +166,33 @@ unsigned long Blink(int Pin,unsigned long LastMillisLed){
     digitalWrite(Pin, !digitalRead(Pin));
   }
   return LastMillisLed;
+}
+
+void StampaDebug2(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
+    Serial.print(millis());
+    Serial.print(";");
+    for(int i=0; i<TOTAL_CH ;i++){
+        if(i!=unused_ch_1 && i!=unused_ch_2){
+            Serial.print(bms_ic[0].cells.c_codes[i]*0.0001,4);
+            Serial.print(";");
+        }
+    }
+     for(int i=0; i<NtcUsati ;i++){
+            Serial.print(ReadTempGrad (3,0,bms_ic));
+            Serial.print(";");
+    }
+    if(InCarica)
+        Serial.print("Si");
+    else 
+        Serial.print("No");
+
+    Serial.print(";");
+    if(CaricaCompletata)
+        Serial.print("Si");
+    else 
+        Serial.print("No");
+
+    Serial.print(";");
+
+    Serial.println();
 }

@@ -128,7 +128,7 @@ bool IsCharged=false;                //serve per controllare che stiamo caricand
  ******************************************************/
 
 cell_asic bms_ic[TOTAL_IC];                   //array di tensioni
-Pacco pacco(1,16,1);                          //array di ogetti
+Pacco pacco(1,18,1);                          //array di ogetti
 /*!**********************************************************************
   \brief  Inititializes hardware and variables
  ***********************************************************************/
@@ -157,29 +157,33 @@ void loop(){
   bool ChargeSwitch=digitalRead (ChargeSwitchPin);
   //--interfaccia utente temporanea--//
   //if (Serial.available()){           // Check for user input
-  if(false){
-    uint8_t user_command;
+  if(true){
+    /*uint8_t user_command;
     Serial.println("inserisci un numero qualsiasi per lanciare il programma");
     user_command = read_int();      // whait for a key
-  
+    */
    //---------------------------------//
     voltage_measurment(bms_ic);             //leggo le tensioni dall'adc
     gpio_measurment(bms_ic);                //leggo le temperature dall'adc
     if(pacco.error_check(bms_ic))           //controllo degli errori
-      shoutdown_error(RelayPin);            //e spengo tutto se c'è un errore
+      shoutdown_error();            //e spengo tutto se c'è un errore
    
     
     while (ChargeSwitch==HIGH && !IsCharged) {
       close_relay(RelayPin);
       voltage_measurment(bms_ic);
+      gpio_measurment(bms_ic);
       LastMillisLed1=Blink(LedCarica,LastMillisLed1);
       if (pacco.error_check(bms_ic)) {      //se c'è un errore evito di tornare in questo ciclo
-        shoutdown_error(RelayPin);
+        shoutdown_error();
         IsCharged=true;
         SpegniLed(LedCarica);
         break;
       }
+      delay(1000);
       IsCharged=pacco.carica(bms_ic);
+      ChargeSwitch=digitalRead (ChargeSwitchPin);
+      
     }
     if(IsCharged && ChargeSwitch==LOW) {
       IsCharged=false;
@@ -194,14 +198,14 @@ void loop(){
     un po' difficile da capire, ma dovrebbe funzionare
     */
 
-    Serial.println(ReadTempGrad (3,0,bms_ic));//0 sarebbe il prmio IC
+    //Serial.println(ReadTempGrad (3,0,bms_ic));//0 sarebbe il prmio IC
 
     /*debug*/
     if(millis()-TempoPrec>3000){
       TempoPrec=millis();
       pacco.StampaDebug(bms_ic, IsCharged, ChargeSwitch);
     }
+  LastMillisLed2 = Blink(LedSistema,LastMillisLed2);
   }
-  LastMillisLed1 = Blink(LedSistema,LastMillisLed1);
-  LastMillisLed2 = Blink(LedCarica,LastMillisLed2);
+  delay(100);
 }

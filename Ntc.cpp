@@ -16,7 +16,7 @@ bool Ntc::error_check(uint16_t temperatura){
     questo avviene nell'else*/
     else{
       if(time_check(tempo, OT_TIME_LIMIT))
-        shoutdown_error(RelayPin);
+        shoutdown_error();
         return true;
         }
       }

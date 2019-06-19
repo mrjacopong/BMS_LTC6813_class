@@ -50,12 +50,12 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata
     Serial.print(";");
     for(int i=0; i<TOTAL_CH ;i++){
         if(i!=unused_ch_1 && i!=unused_ch_2){
-            Serial.print(bms_ic[0].cells.c_codes[i]);
+            Serial.print(bms_ic[0].cells.c_codes[i]*0.0001,4);
             Serial.print(";");
         }
     }
      for(int i=0; i<NtcUsati ;i++){
-            Serial.print(bms_ic[0].aux.a_codes[3]);
+            Serial.print(ReadTempGrad (3,0,bms_ic));
             Serial.print(";");
     }
     if(InCarica)
