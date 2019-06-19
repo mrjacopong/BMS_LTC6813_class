@@ -2,6 +2,7 @@
 
 
 
+
 uint16_t IsTop(uint16_t top,uint16_t actual){                            //ritorna il valore più grande
   if (top>actual){
     return top;
@@ -11,6 +12,7 @@ uint16_t IsTop(uint16_t top,uint16_t actual){                            //ritor
 
 void shoutdown_error(uint8_t pinOut){
   open_relay(pinOut);
+  AccendiLed(LedErrore);
 }
 bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se l'errore persiste
   /*controllo della durata dell'errore*/
@@ -23,6 +25,10 @@ bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se 
 void init_pinout(){ //inizzializza il pinout per l'arduino
   pinMode(RelayPin,OUTPUT);
   pinMode(ChargeSwitchPin,INPUT);
+  pinMode(LedErrore,OUTPUT);
+  pinMode(LedSistema,OUTPUT);
+  pinMode(LedCarica,OUTPUT);
+  pinMode(LedBilanciamentoPesante,OUTPUT);
 }
 bool stop_charge(uint8_t pinOut){  //ferma la carica 
   open_relay(pinOut);
@@ -40,11 +46,13 @@ void final_balance(uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t mo
 
 void greater_balance(uint16_t tensoine_iniziale,uint8_t pinOut,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
   open_relay(pinOut);
+  AccendiLed(LedBilanciamentoPesante);
   while (tensoine_iniziale - bms_ic[modulo].cells.c_codes[cella] >= delta_carica){
     set_discharge(cella,bms_ic);
     voltage_measurment(bms_ic);
   } //finquando la tensione attuale non si abbassa di un delta definito da noi non esce dal ciclo
   close_relay(pinOut);
+  SpegniLed(LedBilanciamentoPesante);
 }
 
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]){
@@ -108,4 +116,38 @@ void voltage_measurment(cell_asic bms_ic[]){
   Serial.println(F("mS"));
   Serial.println();*/
   ltc6813_rdcv(0, TOTAL_IC, bms_ic); // Set to read back all cell voltage registers
+}
+
+void StampaHeaderTabella(){
+  Serial.print("Tempo;");
+  for (int i=0; i<CelleUsate; i++){
+    Serial.print("cella ");
+    Serial.print(i);
+    Serial.print(";");
+  }
+  for (int i=0; i<NtcUsati; i++){
+    Serial.print("ntc ");
+    Serial.print(i);
+    Serial.print(";");
+  }
+  Serial.print("in carica;");
+  Serial.print("carica completata");
+  Serial.println();
+}
+
+void AccendiLed(int Pin){
+    digitalWrite(Pin,HIGH);    
+}
+
+void SpegniLed(int Pin){
+    digitalWrite(Pin,LOW);
+}
+
+unsigned long Blink(int Pin,unsigned long LastMillisLed){
+  if(millis() - LastMillisLed > intervalloBlink) {
+    LastMillisLed = millis(); //save the last time you blinked the LED
+    //if the LED is off turn it on and vice-versa:
+    digitalWrite(Pin, !digitalRead(Pin));
+  }
+  return LastMillisLed;
 }

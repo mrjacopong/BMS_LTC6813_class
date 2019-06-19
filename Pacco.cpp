@@ -44,3 +44,32 @@ void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di a
             modulo[i]->StampaTemp (bms_ic,i);
         }
 }
+
+void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
+    Serial.print(millis());
+    Serial.print(";");
+    for(int i=0; i<TOTAL_CH ;i++){
+        if(i!=unused_ch_1 && i!=unused_ch_2){
+            Serial.print(bms_ic[0].cells.c_codes[i]);
+            Serial.print(";");
+        }
+    }
+     for(int i=0; i<NtcUsati ;i++){
+            Serial.print(bms_ic[0].aux.a_codes[3]);
+            Serial.print(";");
+    }
+    if(InCarica)
+        Serial.print("Si");
+    else 
+        Serial.print("No");
+
+    Serial.print(";");
+    if(CaricaCompletata)
+        Serial.print("Si");
+    else 
+        Serial.print("No");
+
+    Serial.print(";");
+
+    Serial.println();
+}

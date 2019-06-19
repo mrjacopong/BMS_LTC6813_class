@@ -1,6 +1,17 @@
 #ifndef LIBRERIAFUNZIONI_h
 #define LIBRERIAFUNZIONI_h
+
+
+#define LedBilanciamentoPesante 7           //Definisco i pin dei led e del relè
+#define LedSistema 4
+#define LedCarica 5
+#define LedErrore 3
+#define RelayPin 6
+#define ChargeSwitchPin 2
+
 #include "ltc6813.h"
+
+const unsigned long intervalloBlink = 200;  //Parametri per la stampa 
 
 //ADC Command Configurations
 const uint8_t ADC_OPT = ADC_OPT_DISABLED; // See ltc6813_daisy.h for Options
@@ -22,16 +33,16 @@ const uint16_t OT_TIME_LIMIT=1000;    // limite di tempo in millisecondi OT
 const uint8_t TOTAL_IC = 1;//!<number of ICs in the daisy chain
 const uint8_t TOTAL_CH = 18; // number of channel used per ADC
 const uint8_t TOTAL_NTC = 8; // number of temperatures per ADC
-const uint8_t unused_ch_1=9;//celle non usate
-const uint8_t unused_ch_2=18;//celle no nusate
+const uint8_t unused_ch_1=9-1;//celle non usate
+const uint8_t unused_ch_2=18-1;//celle non nusate
+const uint8_t CelleUsate=16;
+const uint8_t NtcUsati=1;
 
 //per algoritmo di carica
 const uint16_t delta_carica = 2000;  // massima differenza tra due batterie in serie 
 const uint16_t SogliaCarica=40000;   // soglia tensione carica (4.0V)
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
-const uint8_t RelayPin=10;           //pin del relay da aprire in caso di errore
-const uint8_t ChargeSwitchPin=11;         //pin dello switch per avviare la carica
 /*--variabili per ntc--*/
 const float AA1 = 3.354016 * pow(10, -3);
 const float BB1 = 2.569850 * pow(10, -4);
@@ -58,6 +69,10 @@ void set_discharge(int8_t cella,cell_asic bms_ic[]);
 void reset_discharge(cell_asic bms_ic[]);
 void open_relay(uint8_t relay);
 void close_relay(uint8_t relay);
+void StampaHeaderTabella();
+void AccendiLed(int Pin);
+void SpegniLed(int Pin);
+unsigned long Blink(int Pin,unsigned long LastMillisLed);
 
 
 

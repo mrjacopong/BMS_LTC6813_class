@@ -11,6 +11,7 @@ bool Cella::error_check(uint16_t tensione){
         if (flag_error==false){                                      //si triggera l'if se c'è
             tempo=millis();                                          //un error_OT nuovo lo segno
             flag_error=true;                                         //e inizializzo il tempo.
+            
         }
     /*se un error_OV è vecchio non c'è bisogno di flaggarlo
     ma bisogna controllare che il tempo non ecceda il limite
