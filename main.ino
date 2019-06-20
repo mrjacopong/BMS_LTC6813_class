@@ -74,7 +74,13 @@ FUNCTION-> int8_t spi_read(int8_t  data) :183
 	//while (!(SPSR & _BV(SPIF)));
 	//return SPDR; 
 */
-
+/*modifiche su ltc681x.cpp IMPORTANTI
+  aggiungere a 
+  FUNCTION-> void clear_discharge(uint8_t total_ic, cell_asic ic[]) :1067
+    ic[i].configb.tx_data[0] = 0;
+    ic[i].configb.tx_data[1] = 0;
+  
+  altrimenti non funziona reset reset_discharge*/
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -193,9 +199,11 @@ void loop(){
     }
       if(ChargeSwitch==LOW){
         open_relay(RelayPin);
-        Serial.println("sono nell'if e resetto");
         reset_discharge(bms_ic);
       }
+      wakeup_sleep(TOTAL_IC);
+      ltc6813_wrcfg(TOTAL_IC,bms_ic);
+      ltc6813_wrcfgb(TOTAL_IC,bms_ic);
     }
     if(IsCharged && ChargeSwitch==LOW) {
       IsCharged=false;
