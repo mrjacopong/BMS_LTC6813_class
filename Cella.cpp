@@ -38,25 +38,27 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
   }
   if(tensione-low_voltage>=delta_carica-100){
     flag_inScarica=true;
-      if(tensione-low_voltage>delta_carica+delta_carica){
+    if(tensione-low_voltage>delta_carica+delta_carica){
     /*bilanciamento intermedio ma più potente*/
     /*ferma la carica e bilancia*/
 
-    if(greater_balance(low_voltage,bms_ic, modulo_corrente, cella_corrente)==false){
-      reset_discharge(bms_ic);
-      close_relay(RelayPin);
-      SpegniLed(LedBilanciamentoPesante);
+      if(greater_balance(low_voltage,bms_ic, modulo_corrente, cella_corrente)==false){
+        reset_discharge(bms_ic);
+        close_relay(RelayPin);
+        SpegniLed(LedBilanciamentoPesante);
+      }
+
     }
-
-  }else{
-    Serial.println(cella_corrente);
-
+  else{
     intermediate_balance(cella_corrente,bms_ic);
+   }
   }
-  }else{ if(flag_inScarica){
-        reset_discharge(bms_ic);   //se si è scaricata abbastaza disattivo la scarica e spengo il flag
-        flag_inScarica=false;
-      }}
+  else{ 
+    if(flag_inScarica){
+      reset_discharge(bms_ic);   //se si è scaricata abbastaza disattivo la scarica e spengo il flag
+      flag_inScarica=false;
+    }
+  }
   return false;                   //ritonra false -> vuol dire che la cella non è carica
 }
 
