@@ -4,6 +4,7 @@
 Cella::Cella(){
     tempo=0;
     flag_error=false;
+    flag_inScarica=false;
 }
 
 bool Cella::error_check(uint16_t tensione){
@@ -29,6 +30,10 @@ bool Cella::error_check(uint16_t tensione){
 
 bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente){
   /*controllo se la cella è carica*/
+  if (get_flagInScarica()   &&  low_voltage - bms_ic[modulo_corrente].cells.c_codes[cella_corrente] < delta_carica){  //controllo se la cella si è scaricata a sufficienza
+                reset_discharge(cella_corrente+1,bms_ic);   //se si è scaricata abbastaza disattivo la scarica e spengo il flag
+                flag_inScarica=false;
+            }
   if( tensione >= SogliaCarica){
       final_balance(low_voltage,tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
     return true;  //true -> la cella è carica
@@ -38,9 +43,9 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
     /*ferma la carica e bilancia*/
     greater_balance(low_voltage,bms_ic, modulo_corrente, cella_corrente);
   }
-  if(low_voltage-tensione>delta_carica){
-    
-    //intermediate_balance(cella_corrente,bms_ic);
+  if(low_voltage-tensione>delta_carica){        //se la tensione non va bene metto la cella in scarica e accendo il flag della scarica in corso
+    intermediate_balance(cella_corrente,bms_ic);
+    flag_inScarica=true; 
   }
   return false;                   //ritonra false -> vuol dire che la cella non è carica
 }
@@ -48,6 +53,10 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
 
 bool Cella::get_flag(){
   return flag_error;
+}
+
+bool Cella::get_flagInScarica(){
+  return flag_inScarica;
 }
 
 unsigned long Cella::get_tempo(){
