@@ -51,23 +51,14 @@ void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_a
   se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */
 }
 
-void greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
+bool greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
   open_relay(RelayPin);
   AccendiLed(LedBilanciamentoPesante);
-  unsigned long TempoPrec=0;
-  while (Low_voltage - bms_ic[modulo].cells.c_codes[cella] >= delta_carica && digitalRead(ChargeSwitchPin)){
-    set_discharge(cella+1,bms_ic);
-    voltage_measurment(bms_ic);
-    
-    if(millis()-TempoPrec>3000){//lo rimetto qui altrimenti nel whilw non stampa più
-      TempoPrec=millis();
-      StampaDebug2(bms_ic, false, true);
-    }
-  delay(100);
+  set_discharge(cella+1,bms_ic);
+  if (Low_voltage - bms_ic[modulo].cells.c_codes[cella] >= delta_carica && digitalRead(ChargeSwitchPin)){
+    return true;
   }//finquando la tensione attuale non si abbassa di un delta definito da noi non esce dal ciclo
-  reset_discharge(bms_ic);
-  close_relay(RelayPin);
-  SpegniLed(LedBilanciamentoPesante);
+  return false;
 }
 
 
@@ -116,11 +107,11 @@ void reset_discharge(cell_asic bms_ic[]){
 }
 
 void open_relay(uint8_t relay){
-  digitalWrite(relay, LOW);
+  digitalWrite(relay, HIGH);
 }
 
 void close_relay(uint8_t relay){
-  digitalWrite(relay, HIGH);
+  digitalWrite(relay, LOW);
 }
 
 void voltage_measurment(cell_asic bms_ic[]){

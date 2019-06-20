@@ -180,10 +180,16 @@ void loop(){
         SpegniLed(LedCarica);
         break;
       }
-      delay(1000);
-      IsCharged=pacco.carica(bms_ic);
+      delay(100);
+      //IsCharged=pacco.carica(bms_ic);
       ChargeSwitch=digitalRead (ChargeSwitchPin);
-      
+      if(millis()-TempoPrec>3000){
+      TempoPrec=millis();
+      pacco.StampaDebug(bms_ic, IsCharged, ChargeSwitch);
+    }
+    if(ChargeSwitch==LOW){
+      open_relay(RelayPin);
+    }
     }
     if(IsCharged && ChargeSwitch==LOW) {
       IsCharged=false;
@@ -207,5 +213,5 @@ void loop(){
     }
   LastMillisLed2 = Blink(LedSistema,LastMillisLed2);
   }
-  delay(100);
+  delay(500);
 }
