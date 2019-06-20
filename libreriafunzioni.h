@@ -10,7 +10,6 @@
 #define ChargeSwitchPin 2
 
 #include "ltc6813.h"
-
 const unsigned long intervalloBlink = 200;  //Parametri per la stampa 
 
 //ADC Command Configurations

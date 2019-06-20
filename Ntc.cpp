@@ -18,9 +18,9 @@ bool Ntc::error_check(uint16_t temperatura){
       if(time_check(tempo, OT_TIME_LIMIT))
         shoutdown_error();
         return true;
-        }
-      }
-    else flag_error=false;            //in asssenza di error_OV il flag è diasttivato
+    }
+  }
+  else flag_error=false;            //in asssenza di error_OV il flag è diasttivato
   return false;
 }
 

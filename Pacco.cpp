@@ -33,7 +33,7 @@ void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale 
             Serial.print(i);
             Serial.println(":");
             modulo[i]->StampaVoltaggio (bms_ic,i);
-        }
+    }
 }
 
 void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di arduino 
@@ -42,7 +42,7 @@ void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di a
             Serial.print(i);
             Serial.println(":");
             modulo[i]->StampaTemp (bms_ic,i);
-        }
+    }
 }
 
 void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
@@ -54,10 +54,10 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata
             Serial.print(";");
         }
     }
-     for(int i=0; i<NtcUsati ;i++){
+    for(int i=0; i<NtcUsati ;i++){
             Serial.print(ReadTempGrad (3,0,bms_ic));
             Serial.print(";");
-    }
+    }  
     if(InCarica)
         Serial.print("Si");
     else 

@@ -8,24 +8,24 @@ Cella::Cella(){
 }
 
 bool Cella::error_check(uint16_t tensione){
-    if(tensione> MAXVOLTAGE){
-        if (flag_error==false){                                      //si triggera l'if se c'è
-            tempo=millis();                                          //un error_OT nuovo lo segno
-            flag_error=true;                                         //e inizializzo il tempo.
+  if(tensione> MAXVOLTAGE){
+    if (flag_error==false){                                      //si triggera l'if se c'è
+      tempo=millis();                                          //un error_OT nuovo lo segno
+      flag_error=true;                                         //e inizializzo il tempo.
             
-        }
+    }
     /*se un error_OV è vecchio non c'è bisogno di flaggarlo
     ma bisogna controllare che il tempo non ecceda il limite
     questo avviene nell'else*/
     else{
-        if(time_check(tempo, OT_TIME_LIMIT))
-            shoutdown_error(); 
-            return true;
-        }
+      if(time_check(tempo, OT_TIME_LIMIT))
+        shoutdown_error(); 
+      return true;
     }
-    else flag_error=false;                                             //in asssenza di error_OV il flag è diasttivato
+  }
+  else flag_error=false;                                             //in asssenza di error_OV il flag è diasttivato
     
-    return false;
+  return false;
 }
 
 bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente){
@@ -36,6 +36,7 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
     return true;  //true -> la cella è carica
     flag_inScarica=false;
   }
+
   if(tensione-low_voltage>=delta_carica-100){
     flag_inScarica=true;
     if(tensione-low_voltage>delta_carica+delta_carica){
@@ -54,7 +55,7 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
    }
   }
   else{ 
-    if(flag_inScarica){
+    if(flag_inScarica && tensione-low_voltage>=delta_carica - 300){
       reset_discharge(bms_ic);   //se si è scaricata abbastaza disattivo la scarica e spengo il flag
       flag_inScarica=false;
     }
