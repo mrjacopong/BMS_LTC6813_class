@@ -22,11 +22,13 @@ class Ntc : public Elemento{
 class Cella : public Elemento{
     private:
         unsigned long tempo;
+        bool flag_inScarica;
     public:
         Cella();
         bool error_check(uint16_t tensione);
         bool carica(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente);
         bool get_flag();
+        bool get_flagInScarica();
         unsigned long get_tempo();
 };
 

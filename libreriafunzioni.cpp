@@ -63,7 +63,7 @@ bool greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint
 
 
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]){
-  set_discharge(cella,bms_ic);
+  set_discharge(cella+1,bms_ic);
 }
 
 
