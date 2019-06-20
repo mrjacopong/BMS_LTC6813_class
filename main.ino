@@ -116,6 +116,7 @@ void check_error(int error);
 ***********************************************************/
 bool in_carica=true;                 // true->in carica ; false->non in carica;
 bool IsCharged=false;                //serve per controllare che stiamo caricando
+bool solo_una_volta=true;
 /************************************
   END SETUP
 *************************************/
@@ -170,7 +171,10 @@ void loop(){
    
     
     while (ChargeSwitch==HIGH && !IsCharged) {
-      close_relay(RelayPin);
+      if(solo_una_volta){
+        close_relay(RelayPin);//in questo modo il controllo del relè passa a cella
+        solo_una_volta=false;
+      }
       voltage_measurment(bms_ic);
       gpio_measurment(bms_ic);
       LastMillisLed1=Blink(LedCarica,LastMillisLed1);
@@ -180,19 +184,22 @@ void loop(){
         SpegniLed(LedCarica);
         break;
       }
-      delay(100);
-      //IsCharged=pacco.carica(bms_ic);
+      delay(1000);
+      IsCharged=pacco.carica(bms_ic);
       ChargeSwitch=digitalRead (ChargeSwitchPin);
       if(millis()-TempoPrec>3000){
       TempoPrec=millis();
-      pacco.StampaDebug(bms_ic, IsCharged, ChargeSwitch);
+      pacco.StampaDebug(bms_ic,ChargeSwitch,IsCharged);
     }
-    if(ChargeSwitch==LOW){
-      open_relay(RelayPin);
-    }
+      if(ChargeSwitch==LOW){
+        open_relay(RelayPin);
+        Serial.println("sono nell'if e resetto");
+        reset_discharge(bms_ic);
+      }
     }
     if(IsCharged && ChargeSwitch==LOW) {
       IsCharged=false;
+      solo_una_volta=true;
     }
     /*se lo switch è low vuol dire che non voglio caricare
     appena si triggera entro nel while per la prima volta
@@ -213,5 +220,5 @@ void loop(){
     }
   LastMillisLed2 = Blink(LedSistema,LastMillisLed2);
   }
-  delay(500);
+  delay(1000);
 }
