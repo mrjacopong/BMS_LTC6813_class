@@ -23,7 +23,7 @@ bool Cella::error_check(uint16_t tensione){
       return true;
     }
   }
-  else flag_error=false;                                             //in asssenza di error_OV il flag è diasttivato
+  else flag_error=false;                                        //in asssenza di error_OV il flag è diasttivato
     
   return false;
 }
@@ -31,25 +31,25 @@ bool Cella::error_check(uint16_t tensione){
 bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente,unsigned long *tempoIniziale){
   /*controllo se la cella è carica*/
   if( tensione >= SogliaCarica){
-    final_balance(low_voltage,tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente,tempoIniziale);
-    return true;  //true -> la cella è carica
+    final_balance(low_voltage,tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente,tempoIniziale); //bilanciamento specifico per fine carica
     flag_inScarica=false;
+    return true;  //true -> la cella è carica
   }
 
-  if(tensione-low_voltage>=delta_carica){       //c'è da fare una scarica
-    if(tensione-low_voltage>delta_carica+delta_carica){
-      Serial.println("greater_balance");
+  if(tensione-low_voltage>=delta_carica){               //c'è da fare una scarica per troppa differenza di potenziale
+    if(tensione-low_voltage>delta_carica+delta_carica){   //se la tenisone della cella corrente è molto maggiore di
+      Serial.println("greater_balance");                  //quella della cella a tensione minore avviamo il greater_balance
       greater_balance(low_voltage,bms_ic, modulo_corrente, cella_corrente);
-      *tempoIniziale=millis();
+      *tempoIniziale=millis();                            //inizializziamo il contatore che interrompera' il greater_balance dopo 1 minuto
     }
     else{
-      intermediate_balance(cella_corrente,bms_ic);
-      flag_inScarica=true;
+      intermediate_balance(cella_corrente,bms_ic);        //se non è necessaria la greater_balance usiamo la intermediate_balance
+      flag_inScarica=true;                                  //settiamo il flag della scarica intermedia su vero
     }
   }
   else{ 
-    if(flag_inScarica && tensione-low_voltage<delta_carica -100){
-      reset_discharge(bms_ic);   //se si è scaricata abbastaza disattivo la scarica e spengo il flag
+    if(flag_inScarica && tensione-low_voltage<delta_carica -100){ //se si è scaricata abbastaza disattivo la scarica e spengo il flag
+      reset_discharge(bms_ic);   
       flag_inScarica=false;
     }
   

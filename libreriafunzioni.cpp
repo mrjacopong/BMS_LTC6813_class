@@ -16,6 +16,7 @@ uint16_t IsLow(uint16_t low,uint16_t actual){                            //ritor
 }
 
 void shoutdown_error(){
+  reset_discharge();
   open_relay(RelayPin);
   AccendiLed(LedErrore);
   SpegniLed(LedCarica);
