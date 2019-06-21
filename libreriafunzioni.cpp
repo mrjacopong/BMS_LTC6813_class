@@ -48,6 +48,11 @@ void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_a
   if (tensione >= SogliaCarica + 900){
     greater_balance(Low_voltage,bms_ic,modulo,cella);
     *tempoIniziale=millis();
+    Serial.println("greater_balance dentro final");
+    Serial.print(tensione);
+    Serial.println(" cella numero:");
+    Serial.println(cella);
+    Serial.println();
   }
   /*voglio che se la batteria sia a 4,05V va bene
   se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */

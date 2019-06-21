@@ -39,7 +39,7 @@ const uint8_t NtcUsati=1;
 
 //per algoritmo di carica
 const uint16_t delta_carica = 2000;  // massima differenza tra due batterie in serie 
-const uint16_t SogliaCarica=4100;   // soglia tensione carica (4.0V)
+const uint16_t SogliaCarica=41000;   // soglia tensione carica (4.1V)
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
 /*--variabili per ntc--*/
