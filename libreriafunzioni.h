@@ -22,7 +22,7 @@ const uint8_t STAT_CH_TO_CONVERT = STAT_CH_ALL; // See ltc6813_daisy.h for Optio
 const uint16_t MEASUREMENT_LOOP_TIME = 500;//milliseconds(mS)
 
 //Under Voltage and Over Voltage Thresholds
-const uint16_t OV_THRESHOLD = 41000; // Over voltage threshold ADC Code. LSB = 0.0001
+const uint16_t OV_THRESHOLD = 42000; // Over voltage threshold ADC Code. LSB = 0.0001
 const uint16_t UV_THRESHOLD = 30000; // Under voltage threshold ADC Code. LSB = 0.0001
 const uint16_t MAXTEMP = 60;         // Over temperature GRADI CENTIGRADI
 const double MAXVOLTAGE = OV_THRESHOLD;    // per convertirla in double nella funzione error_check
@@ -60,7 +60,7 @@ void shoutdown_error();
 bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();
 bool stop_charge(uint8_t pinOut);
-void final_balance(uint16_t Low_voltage,uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella);
+void final_balance(uint16_t Low_voltage,uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempoiniziale);
 void greater_balance(uint16_t tensoine_iniziale,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]);
 void gpio_measurment(cell_asic bms_ic[]);

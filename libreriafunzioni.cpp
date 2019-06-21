@@ -43,11 +43,11 @@ bool stop_charge(uint8_t pinOut){  //ferma la carica
   return true;
 }
 
-void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella){
-  if (tensione >= SogliaCarica + 500)
+void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempoIniziale){
     intermediate_balance(cella,bms_ic);
   if (tensione >= SogliaCarica + 900){
     greater_balance(Low_voltage,bms_ic,modulo,cella);
+    *tempoIniziale=millis();
   }
   /*voglio che se la batteria sia a 4,05V va bene
   se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */
