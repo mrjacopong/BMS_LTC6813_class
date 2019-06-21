@@ -75,7 +75,7 @@ void gpio_measurment(cell_asic bms_ic[]){
   ltc6813_adax(ADC_CONVERSION_MODE , AUX_CH_TO_CONVERT);
   ltc6813_pollAdc();
   wakeup_sleep(TOTAL_IC);
-  ltc6813_rdaux(0,TOTAL_IC,bms_ic);                                   // questo serve a caso
+  ltc6813_rdaux(0,TOTAL_IC,bms_ic);                             
 }
 
 

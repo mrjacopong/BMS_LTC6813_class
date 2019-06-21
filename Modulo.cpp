@@ -19,15 +19,15 @@ Modulo::Modulo(int N_celle,int N_ntc){
 
 }
 bool Modulo::error_check(cell_asic bms_ic[],int modulo_corrente){
-    for (int i=0;i<n_celle;i++){
+    for (int i=0;i<n_celle;i++){ //controllo errore overvoltage
         //salta la cella  unused_ch_1=9 e unused_ch_2=18
         //queste due celle sono sempre a 0v e non sono un errore
         if ((modulo_corrente== unused_ch_1) || (modulo_corrente == unused_ch_2))
             return false;
-        if (cella[i]->error_check(bms_ic[modulo_corrente].cells.c_codes[i])==true)
+        if (cella[i]->error_check(bms_ic[modulo_corrente].cells.c_codes[i])==true) 
             return true;
     }
-    for (int j=0;j<n_ntc;j++){
+    for (int j=0;j<n_ntc;j++){ //controllo errore overtemperature
        if( ntc[j]->error_check(bms_ic[modulo_corrente].aux.a_codes[j])==true)
             return true;
     }
@@ -35,12 +35,12 @@ bool Modulo::error_check(cell_asic bms_ic[],int modulo_corrente){
 }
 
 bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente){
-    low_voltage=60000;
-    if(tempoIniziale==0){
+    low_voltage=60000; //inizzializzo il low_voltage ad ogni ciclo in quanto lo devo confrontare con ogni cella
+    if(tempoIniziale==0){//altrimenti viene confrontato il low_voltage vecchio
         modulo_carico=true;           //diventa false se c'è almeno una cella scarcia
         for (int i=0;i<n_celle;i++){
             if ( i!= unused_ch_1 && i!= unused_ch_2) {
-                low_voltage=IsLow(low_voltage,bms_ic[modulo_corrente].cells.c_codes[i]);    
+                low_voltage=IsLow(low_voltage,bms_ic[modulo_corrente].cells.c_codes[i]); //trovo tensione minore    
                 if (!cella[i]->carica(bms_ic[modulo_corrente].cells.c_codes[i],bms_ic,low_voltage,modulo_corrente,i,&tempoIniziale))
                     modulo_carico=false;  //se c'è almeno una cella scarica vuol dire che il modulo non è carico 
             }
