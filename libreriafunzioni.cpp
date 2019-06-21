@@ -18,6 +18,8 @@ uint16_t IsLow(uint16_t low,uint16_t actual){                            //ritor
 void shoutdown_error(){
   open_relay(RelayPin);
   AccendiLed(LedErrore);
+  SpegniLed(LedCarica);
+  SpegniLed(LedBilanciamentoPesante);
 }
 bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se l'errore persiste
   /*controllo della durata dell'errore*/
@@ -51,14 +53,10 @@ void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_a
   se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */
 }
 
-bool greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
+void greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
   open_relay(RelayPin);
   AccendiLed(LedBilanciamentoPesante);
   set_discharge(cella+1,bms_ic);
-  if (Low_voltage - bms_ic[modulo].cells.c_codes[cella] >= delta_carica && digitalRead(ChargeSwitchPin)){
-    return true;
-  }//finquando la tensione attuale non si abbassa di un delta definito da noi non esce dal ciclo
-  return false;
 }
 
 
@@ -77,7 +75,7 @@ void gpio_measurment(cell_asic bms_ic[]){
 
 
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //legge la temperatura in gradi              //solo il pin passato             
-  gpio_measurment(bms_ic);                                                  //e l'IC passato
+  gpio_measurment(bms_ic);                                                 //e l'IC passato
   float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;
   float Vref2=bms_ic[current_ic].aux.a_codes[5]*0.0001;
   float Rntc = ((Resistenza * Vref2) / Vout) - Resistenza;
@@ -169,19 +167,19 @@ void StampaDebug2(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
         }
     }
      for(int i=0; i<NtcUsati ;i++){
-            Serial.print(ReadTempGrad (3,0,bms_ic));
-            Serial.print(";");
+       Serial.print(ReadTempGrad (3,0,bms_ic));
+       Serial.print(";");
     }
     if(InCarica)
-        Serial.print("Si");
+      Serial.print("Si");
     else 
-        Serial.print("No");
+      Serial.print("No");
 
     Serial.print(";");
     if(CaricaCompletata)
-        Serial.print("Si");
+      Serial.print("Si");
     else 
-        Serial.print("No");
+      Serial.print("No");
 
     Serial.print(";");
 

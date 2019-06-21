@@ -172,6 +172,7 @@ void loop(){
     if(ChargeSwitch==LOW){                //se vogliamo interrompere la carica apriamo il rele' 
       open_relay(RelayPin);               //e interrompiamo la scarica delle celle(bilanciamenti)
       reset_discharge(bms_ic);
+      solo_una_volta=true;
     }
     if(millis()-TempoPrec>5000){          //stampa ogni intervallo per la tabella
     TempoPrec=millis();

@@ -61,7 +61,7 @@ bool time_check(unsigned long t_inizio ,uint16_t durata_max );
 void init_pinout();
 bool stop_charge(uint8_t pinOut);
 void final_balance(uint16_t Low_voltage,uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella);
-bool greater_balance(uint16_t tensoine_iniziale,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
+void greater_balance(uint16_t tensoine_iniziale,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
 void intermediate_balance(int8_t cella,cell_asic bms_ic[]);
 void gpio_measurment(cell_asic bms_ic[]);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic);

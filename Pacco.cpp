@@ -4,6 +4,7 @@
 Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){
     flag_error=false;
     n_moduli=N_moduli;
+    tempoIniziale=0;
     modulo= new Modulo* [N_moduli];
     for (int i=0;i<N_moduli;i++){
     modulo[i] = new Modulo(N_celle,N_ntc);
@@ -17,14 +18,21 @@ bool Pacco::error_check(cell_asic bms_ic[]){
             return true;
     }
     return false;
-}
+}   
 
-bool Pacco::carica(cell_asic bms_ic[]){
-    for (int i=0;i<n_moduli;i++){
-    if(modulo[i]->carica(bms_ic,i)) //true se carica
-        stop_charge(RelayPin);      //stoppa la carica del modulo in queestione
+bool Pacco::carica(cell_asic bms_ic[],unsigned long* tempoIniziale){
+    if(tempoIniziale=0){
+        for (int i=0;i<n_moduli;i++){
+        if(modulo[i]->carica(bms_ic,i,&tempoIniziale)) //true se carica
+            stop_charge(RelayPin);      //stoppa la carica del modulo in queestione
+        }
     }
-
+    else if(millis()-tempoIniziale){
+        tempoIniziale=0;
+        reset_discharge(bms_ic);
+        SpegniLed(LedBilanciamentoPesante);
+        close_relay(RelayPin);
+    }
 }
 
 void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale di arduino
