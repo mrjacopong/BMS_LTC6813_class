@@ -32,7 +32,9 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t low_voltage,uin
   /*controllo se la cella è carica*/
   if( tensione >= SogliaCarica){
     final_balance(low_voltage,tensione,RelayPin,bms_ic,modulo_corrente,cella_corrente);
-    Serial.println("la cella è carica");
+    Serial.println("la cella e' carica");
+    Serial.print(cella_corrente);
+    Serial.println();
     return true;  //true -> la cella è carica
     flag_inScarica=false;
   }
