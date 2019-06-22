@@ -174,7 +174,7 @@ void loop(){
       reset_discharge(bms_ic);
       solo_una_volta=true;
     }
-    if(millis()-TempoPrec>5000){          //stampa ogni intervallo per la tabella
+    if(millis()-TempoPrec>30000){          //stampa ogni intervallo per la tabella
     TempoPrec=millis();
     pacco.StampaDebug(bms_ic,ChargeSwitch,IsCharged);
     }

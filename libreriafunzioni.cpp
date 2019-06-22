@@ -16,7 +16,7 @@ uint16_t IsLow(uint16_t low,uint16_t actual){                            //ritor
 }
 
 void shoutdown_error(){
-  reset_discharge();
+  //reset_discharge(bms_ic);
   open_relay(RelayPin);
   AccendiLed(LedErrore);
   SpegniLed(LedCarica);
@@ -46,7 +46,7 @@ bool stop_charge(uint8_t pinOut){  //ferma la carica
 
 void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempoIniziale){
     intermediate_balance(cella,bms_ic);
-  if (tensione >= SogliaCarica + 900){
+  if (tensione >= SogliaCarica + 1900){
     greater_balance(Low_voltage,bms_ic,modulo,cella);
     *tempoIniziale=millis();
     Serial.println("greater_balance dentro final");
