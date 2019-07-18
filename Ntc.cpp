@@ -5,7 +5,7 @@ Ntc::Ntc(){
     flag_error=false;
 }
 
-bool Ntc::error_check(uint16_t temperatura){
+bool Ntc::ErrorCheck(uint16_t temperatura){
   if(temperatura  > MAXTEMP){
     if (flag_error==false){                                       //si triggera l'if se c'è  
       flag_error=true;                                            //un error_OT nuovo lo segno 
@@ -15,8 +15,8 @@ bool Ntc::error_check(uint16_t temperatura){
     ma bisogna controllare che il tempo non ecceda il limite
     questo avviene nell'else*/
     else{
-      if(time_check(tempo, OT_TIME_LIMIT))
-        shoutdown_error();
+      if(TimeCheck(tempo, OT_TIME_LIMIT))
+        ShoutdownError();
         return true;
     }
   }
@@ -24,10 +24,10 @@ bool Ntc::error_check(uint16_t temperatura){
   return false;
 }
 
-bool Ntc::get_flag(){
+bool Ntc::GetFlag(){
   return flag_error;
 }
 
-unsigned long Ntc::get_tempo(){
+unsigned long Ntc::GetTempo(){
   return tempo;
 }

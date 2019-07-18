@@ -80,7 +80,7 @@ FUNCTION-> int8_t spi_read(int8_t  data) :183
     ic[i].configb.tx_data[0] = 0;
     ic[i].configb.tx_data[1] = 0;
   
-  altrimenti non funziona reset reset_discharge*/
+  altrimenti non funziona reset ResetDischarge*/
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -101,9 +101,9 @@ FUNCTION-> int8_t spi_read(int8_t  data) :183
 #define DATALOG_ENABLED 1
 #define DATALOG_DISABLED 0
 
-unsigned long LastMillisLed1 = 0;      //per il funzionamento del blink
-unsigned long LastMillisLed2 = 0;      //per il funzionamento del blink
-unsigned long TempoPrec=0;
+unsigned long last_millis_led1 = 0;      //per il funzionamento del blink
+unsigned long last_millis_led2 = 0;      //per il funzionamento del blink
+unsigned long tempo_prec=0;
 
 /**********************************************************
   Setup Variables
@@ -112,7 +112,7 @@ unsigned long TempoPrec=0;
 
 ***********************************************************/
 bool in_carica=true;                 // true->in carica ; false->non in carica;
-bool IsCharged=false;                //serve per controllare che stiamo caricando
+bool is_charged=false;                //serve per controllare che stiamo caricando
 bool solo_una_volta=true;            //per controllare che sia la prima volta che entriamo nel while e quindi dobbiamo chiudere il relè
 /************************************
   END SETUP
@@ -126,7 +126,7 @@ bool solo_una_volta=true;            //per controllare che sia la prima volta ch
  ******************************************************/
 
 cell_asic bms_ic[TOTAL_IC];                   //array di tensioni
-Pacco pacco(1,18,1);                          //array di ogetti
+Pacco pacco(TOTAL_IC,18,1);                   //array di ogetti
 /*!**********************************************************************
   \brief  Inititializes hardware and variables
  ***********************************************************************/
@@ -142,64 +142,64 @@ void setup()
   ltc681x_init_cfg(TOTAL_IC, bms_ic);
   ltc6813_reset_crc_count(TOTAL_IC, bms_ic);
   ltc6813_init_reg_limits(TOTAL_IC, bms_ic);
-  init_pinout();              //inizializza i pin per led e rele'
+  InitPinOut();              //inizializza i pin per led e rele'
   StampaHeaderTabella();
 }
 
 void loop(){
  
-  bool ChargeSwitch=digitalRead (ChargeSwitchPin);
-  voltage_measurment(bms_ic);             //leggo le tensioni dall'adc
-  gpio_measurment(bms_ic);                //leggo le temperature dall'adc
-  if(pacco.error_check(bms_ic))           //controllo degli errori
-    shoutdown_error();                    //e spengo tutto se c'è un errore
+  bool charge_switch_state=digitalRead (charge_switch_pin);
+  VoltageMeasurment(bms_ic);             //leggo le tensioni dall'adc
+  GpioMeasurment(bms_ic);                //leggo le temperature dall'adc
+  if(pacco.ErrorCheck(bms_ic))           //controllo degli errori
+    ShoutdownError();                    //e spengo tutto se c'è un errore
   
   
-  while (ChargeSwitch==HIGH && !pacco.error_check(bms_ic) && !IsCharged) {  //se c'è un errore interrompo la carica uscendo dal ciclo di carica
+  while (charge_switch_state==HIGH && !pacco.ErrorCheck(bms_ic) && !is_charged) {  //se c'è un errore interrompo la carica uscendo dal ciclo di carica
     if(solo_una_volta){                   //entra nell'if solo all'inizio del primo ciclo
-      close_relay(RelayPin);              //in questo modo il controllo del relè passa a cella.carica()
+      CloseRelay(relay_pin);              //in questo modo il controllo del relè passa a cella.carica()
       solo_una_volta=false;               //dopo essersi chiuso la prima volta per iniziare la carica
     }
-    voltage_measurment(bms_ic);           
-    gpio_measurment(bms_ic);
-    IsCharged=pacco.carica(bms_ic);       //algorimtmo di carica
-    ChargeSwitch=digitalRead (ChargeSwitchPin);
+    VoltageMeasurment(bms_ic);           
+    GpioMeasurment(bms_ic);
+    is_charged=pacco.carica(bms_ic);       //algorimtmo di carica
+    charge_switch_state=digitalRead (charge_switch_pin);
     delay(1000);
     
-    LastMillisLed1=Blink(LedCarica,LastMillisLed1); //codice per led di debug
-    SpegniLed(LedSistema);
+    last_millis_led1=Blink(led_carica,last_millis_led1); //codice per led di debug
+    SpegniLed(led_sistema);
 
-    if(ChargeSwitch==LOW){                //se vogliamo interrompere la carica apriamo il rele' 
-      open_relay(RelayPin);               //e interrompiamo la scarica delle celle(bilanciamenti)
-      reset_discharge(bms_ic);
+    if(charge_switch_state==LOW){                //se vogliamo interrompere la carica apriamo il rele' 
+      OpenRelay(relay_pin);               //e interrompiamo la scarica delle celle(bilanciamenti)
+      ResetDischarge(bms_ic);
       solo_una_volta=true;
     }
-    if(millis()-TempoPrec>30000){          //stampa ogni intervallo per la tabella
-    TempoPrec=millis();
-    pacco.StampaDebug(bms_ic,ChargeSwitch,IsCharged);
+    if(millis()-tempo_prec>30000){          //stampa ogni intervallo per la tabella
+    tempo_prec=millis();
+    pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
     }
   }
 
 
-  if(IsCharged && ChargeSwitch==LOW) {
-    IsCharged=false;
+  if(is_charged && charge_switch_state==LOW) {
+    is_charged=false;
     solo_una_volta=true;
   }
   /*se lo switch è low vuol dire che non voglio caricare
   appena si triggera entro nel while per la prima volta
-  faccio la carica in loop, appena finisce IsCharged è vero, quindi non entra nel loop di nuovo
+  faccio la carica in loop, appena finisce is_charged è vero, quindi non entra nel loop di nuovo
   appena rimetto lo switch in low, vuol dire che non voglio più caricare
-  quindi setto IsCharged falso in modo fa autorizzare la carica 
+  quindi setto is_charged falso in modo fa autorizzare la carica 
   per la prossima volta che voglio caricare
 
   un po' difficile da capire, ma dovrebbe funzionare
 
   /*debug*/
-  if(millis()-TempoPrec>3000){        //stampa ogni intervallo per la tabella (se siamo fuori dal while)
-    TempoPrec=millis();
-    pacco.StampaDebug(bms_ic, IsCharged, ChargeSwitch);
+  if(millis()-tempo_prec>3000){        //stampa ogni intervallo per la tabella (se siamo fuori dal while)
+    tempo_prec=millis();
+    pacco.StampaDebug(bms_ic, is_charged, charge_switch_state);
   }
-  LastMillisLed2 = Blink(LedSistema,LastMillisLed2); //codice per led di debug
-  SpegniLed(LedCarica);
+  last_millis_led2 = Blink(led_sistema,last_millis_led2); //codice per led di debug
+  SpegniLed(led_carica);
   delay(1000);
 }

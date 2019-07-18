@@ -15,14 +15,14 @@ uint16_t IsLow(uint16_t low,uint16_t actual){                            //ritor
   return actual;
 }
 
-void shoutdown_error(){
-  //reset_discharge(bms_ic);
-  open_relay(RelayPin);
-  AccendiLed(LedErrore);
-  SpegniLed(LedCarica);
-  SpegniLed(LedBilanciamentoPesante);
+void ShoutdownError(){
+  //ResetDischarge(bms_ic);
+  OpenRelay(relay_pin);
+  AccendiLed(led_errore);
+  SpegniLed(led_carica);
+  SpegniLed(led_bilanciamento_pesante);
 }
-bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se l'errore persiste
+bool TimeCheck(unsigned long t_inizio ,uint16_t durata_max ){        //true se l'errore persiste
   /*controllo della durata dell'errore*/
   if (millis()-t_inizio>durata_max){
     return true;
@@ -30,48 +30,56 @@ bool time_check(unsigned long t_inizio ,uint16_t durata_max ){        //true se 
   return false;
 }
 
-void init_pinout(){ //inizzializza il pinout per l'arduino
-  pinMode(RelayPin,OUTPUT);
-  digitalWrite(RelayPin, HIGH);
-  pinMode(ChargeSwitchPin,INPUT);
-  pinMode(LedErrore,OUTPUT);
-  pinMode(LedSistema,OUTPUT);
-  pinMode(LedCarica,OUTPUT);
-  pinMode(LedBilanciamentoPesante,OUTPUT);
+void InitPinOut(){ //inizzializza il pinout per l'arduino
+  pinMode(relay_pin,OUTPUT);
+  digitalWrite(relay_pin, HIGH);
+  pinMode(charge_switch_pin,INPUT);
+  pinMode(led_errore,OUTPUT);
+  pinMode(led_sistema,OUTPUT);
+  pinMode(led_carica,OUTPUT);
+  pinMode(led_bilanciamento_pesante,OUTPUT);
 }
-bool stop_charge(uint8_t pinOut){  //ferma la carica 
-  open_relay(pinOut);
+bool StopCharge(uint8_t pin_out){  //ferma la carica 
+  OpenRelay(pin_out);
   return true;
 }
 
-void final_balance(uint16_t Low_voltage, uint16_t tensione,uint8_t pinOut,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempoIniziale){
-    intermediate_balance(cella,bms_ic);
-  if (tensione >= SogliaCarica + 1900){
-    greater_balance(Low_voltage,bms_ic,modulo,cella);
-    *tempoIniziale=millis();
-    Serial.println("greater_balance dentro final");
+bool FinalBalance(uint16_t Low_voltage, uint16_t tensione,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempo_iniziale){
+  //ritorna se sta scaricando o meno
+  
+  if (tensione-Low_voltage >= delta_carica_finale){
+    IntermediateBalance(cella,bms_ic);
+    return true;
+  }
+  
+  if (tensione >= 41900){          //tensione poco prima dell'errore
+    GreaterBalance(Low_voltage,bms_ic,modulo,cella);
+    *tempo_iniziale=millis();
+    Serial.println("GreaterBalance dentro final");
     Serial.print(tensione);
     Serial.println(" cella numero:");
     Serial.println(cella);
     Serial.println();
+    return true;
   }
-  /*voglio che se la batteria sia a 4,05V va bene
-  se arriva a 4.09V bilancio maggiormente perchè non volgio arrivare a 4.1v */
+  return false;
+  /*voglio che se la batteria sia a 4,15V va bene
+  se arriva a 4.19V bilancio maggiormente perchè non volgio arrivare a 4.2v */
 }
 
-void greater_balance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
-  open_relay(RelayPin);
-  AccendiLed(LedBilanciamentoPesante);
-  set_discharge(cella+1,bms_ic);
-}
-
-
-void intermediate_balance(int8_t cella,cell_asic bms_ic[]){
-  set_discharge(cella+1,bms_ic);
+void GreaterBalance(uint16_t Low_voltage,cell_asic bms_ic[],uint8_t modulo,uint8_t cella){
+  OpenRelay(relay_pin);
+  AccendiLed(led_bilanciamento_pesante);
+  SetDischarge(cella+1,bms_ic);
 }
 
 
-void gpio_measurment(cell_asic bms_ic[]){
+void IntermediateBalance(int8_t cella,cell_asic bms_ic[]){
+  SetDischarge(cella+1,bms_ic);
+}
+
+
+void GpioMeasurment(cell_asic bms_ic[]){
   wakeup_sleep(TOTAL_IC);                                             //converte gpio
   ltc6813_adax(ADC_CONVERSION_MODE , AUX_CH_TO_CONVERT);
   ltc6813_pollAdc();
@@ -81,7 +89,7 @@ void gpio_measurment(cell_asic bms_ic[]){
 
 
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //legge la temperatura in gradi              //solo il pin passato             
-  gpio_measurment(bms_ic);                                                 //e l'IC passato
+  GpioMeasurment(bms_ic);                                                 //e l'IC passato
   float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;
   float Vref2=bms_ic[current_ic].aux.a_codes[5]*0.0001;
   float Rntc = ((Resistenza * Vref2) / Vout) - Resistenza;
@@ -94,7 +102,7 @@ float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //leg
   float Temp = (pow(sum, -1)-274);
   return (Temp);
 }
-void set_discharge(int8_t cella,cell_asic bms_ic[]){
+void SetDischarge(int8_t cella,cell_asic bms_ic[]){
   /*da testare quando acremo più moduli,non attiva ora perchè bisognerebbe modificare alcune librerie */
   //ltc6813_set_discharge(cella,modulo,bms_ic);
   ltc6813_set_discharge(cella,TOTAL_IC,bms_ic);
@@ -103,22 +111,22 @@ void set_discharge(int8_t cella,cell_asic bms_ic[]){
   ltc6813_wrcfgb(TOTAL_IC,bms_ic);
 }
 
-void reset_discharge(cell_asic bms_ic[]){
+void ResetDischarge(cell_asic bms_ic[]){
   clear_discharge(TOTAL_IC,bms_ic);
   wakeup_sleep(TOTAL_IC);
   ltc6813_wrcfg(TOTAL_IC,bms_ic);
   ltc6813_wrcfgb(TOTAL_IC,bms_ic);
 }
 
-void open_relay(uint8_t relay){
+void OpenRelay(uint8_t relay){
   digitalWrite(relay, HIGH);
 }
 
-void close_relay(uint8_t relay){
+void CloseRelay(uint8_t relay){
   digitalWrite(relay, LOW);
 }
 
-void voltage_measurment(cell_asic bms_ic[]){
+void VoltageMeasurment(cell_asic bms_ic[]){
   wakeup_sleep(TOTAL_IC);
   ltc6813_adcv(ADC_CONVERSION_MODE, ADC_DCP, CELL_CH_TO_CONVERT);
   uint8_t conv_time = ltc6813_pollAdc();
@@ -131,12 +139,12 @@ void voltage_measurment(cell_asic bms_ic[]){
 
 void StampaHeaderTabella(){
   Serial.print("Tempo;");
-  for (int i=0; i<CelleUsate; i++){
+  for (int i=0; i<celle_usate; i++){
     Serial.print("cella ");
     Serial.print(i);
     Serial.print(";");
   }
-  for (int i=0; i<NtcUsati; i++){
+  for (int i=0; i<ntc_usati; i++){
     Serial.print("ntc ");
     Serial.print(i);
     Serial.print(";");
@@ -146,24 +154,24 @@ void StampaHeaderTabella(){
   Serial.println();
 }
 
-void AccendiLed(int Pin){
-    digitalWrite(Pin,HIGH);    
+void AccendiLed(int pin){
+    digitalWrite(pin,HIGH);    
 }
 
-void SpegniLed(int Pin){
-    digitalWrite(Pin,LOW);
+void SpegniLed(int pin){
+    digitalWrite(pin,LOW);
 }
 
-unsigned long Blink(int Pin,unsigned long LastMillisLed){
-  if(millis() - LastMillisLed > intervalloBlink) {
-    LastMillisLed = millis(); //save the last time you blinked the LED
+unsigned long Blink(int pin,unsigned long last_millis_led){
+  if(millis() - last_millis_led > intervalloBlink) {
+    last_millis_led = millis(); //save the last time you blinked the LED
     //if the LED is off turn it on and vice-versa:
-    digitalWrite(Pin, !digitalRead(Pin));
+    digitalWrite(pin, !digitalRead(pin));
   }
-  return LastMillisLed;
+  return last_millis_led;
 }
 
-void StampaDebug2(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
+void StampaDebug2(cell_asic bms_ic[], bool in_carica, bool carica_completata){
     Serial.print(millis());
     Serial.print(";");
     for(int i=0; i<TOTAL_CH ;i++){
@@ -172,17 +180,17 @@ void StampaDebug2(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
           Serial.print(";");
         }
     }
-     for(int i=0; i<NtcUsati ;i++){
+     for(int i=0; i<ntc_usati ;i++){
        Serial.print(ReadTempGrad (3,0,bms_ic));
        Serial.print(";");
     }
-    if(InCarica)
+    if(in_carica)
       Serial.print("Si");
     else 
       Serial.print("No");
 
     Serial.print(";");
-    if(CaricaCompletata)
+    if(carica_completata)
       Serial.print("Si");
     else 
       Serial.print("No");
@@ -190,4 +198,8 @@ void StampaDebug2(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
     Serial.print(";");
 
     Serial.println();
+}
+
+float ReadCurrent(){
+  return 1;//faccio finta che passa 1A
 }

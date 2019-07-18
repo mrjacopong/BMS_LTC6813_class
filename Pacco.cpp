@@ -11,9 +11,9 @@ Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){
     cell_asic bms_ic;
 
 }
-bool Pacco::error_check(cell_asic bms_ic[]){ 
+bool Pacco::ErrorCheck(cell_asic bms_ic[]){ 
     for (int i=0;i<n_moduli;i++){ //controllo errore in pacco
-        if(modulo[i]->error_check(bms_ic,i)==true)
+        if(modulo[i]->ErrorCheck(bms_ic,i)==true)
             return true;
     }
     return false;
@@ -21,8 +21,10 @@ bool Pacco::error_check(cell_asic bms_ic[]){
 
 bool Pacco::carica(cell_asic bms_ic[]){
     for (int i=0;i<n_moduli;i++){
-        if(modulo[i]->carica(bms_ic,i)) //true se carica
-            stop_charge(RelayPin);      //stoppa la carica del modulo in queestione
+        if(modulo[i]->carica(bms_ic,i)){//true se carica
+            if(ReadCurrent()<0.05)      //controlla che la corrente sia abbastanza bassa
+                StopCharge(relay_pin);  //stoppa la carica del modulo in queestione
+        }
     }
 }
 
@@ -44,7 +46,7 @@ void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di a
     }
 }
 
-void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata){
+void Pacco::StampaDebug(cell_asic bms_ic[], bool in_carica, bool carica_completata){
     Serial.print(millis());
     Serial.print(";");
     for(int i=0; i<TOTAL_CH ;i++){
@@ -53,17 +55,17 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata
             Serial.print(";");
         }
     }
-    for(int i=0; i<NtcUsati ;i++){
+    for(int i=0; i<ntc_usati ;i++){
             Serial.print(ReadTempGrad (3,0,bms_ic));
             Serial.print(";");
     }  
-    if(InCarica)
+    if(in_carica)
         Serial.print("Si");
     else 
         Serial.print("No");
 
     Serial.print(";");
-    if(CaricaCompletata)
+    if(carica_completata)
         Serial.print("Si");
     else 
         Serial.print("No");
@@ -73,11 +75,11 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool InCarica, bool CaricaCompletata
     Serial.println();
 }
 
-bool Pacco::get_flag(){
+bool Pacco::GetFlag(){
   return flag_error;
 }
 
-int Pacco::get_nModuli(){
+int Pacco::GetN_moduli(){
     return n_moduli;
 }
 
