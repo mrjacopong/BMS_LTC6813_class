@@ -41,7 +41,9 @@ bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente){
         modulo_carico=true;                  //diventa false se c'è almeno una cella scarcia
         for (int i=0;i<n_celle;i++){
             if ( i!= unused_ch_1 && i!= unused_ch_2) {
-                low_voltage=IsLow(low_voltage,bms_ic[modulo_corrente].cells.c_codes[i]); //trovo tensione minore    
+                low_voltage=IsLow(low_voltage,bms_ic[modulo_corrente].cells.c_codes[i]); //trovo tensione minore
+                if (low_voltage<=prec_low_voltage)  //controllo per avere sempre la tensione più bassa ad ogni ciclo
+                    prec_low_voltage=low_voltage;   
                 if (!cella[i]->carica(bms_ic[modulo_corrente].cells.c_codes[i],bms_ic,prec_low_voltage,modulo_corrente,i,&tempo_iniziale))
                     modulo_carico=false;     //se c'è almeno una cella scarica vuol dire che il modulo non è carico 
             }

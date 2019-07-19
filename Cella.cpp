@@ -44,10 +44,14 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uin
     }
     return true;  //true -> la cella è carica
   }
-
-  if(tensione-Low_voltage>=delta_carica){                //c'è da fare una scarica per troppa differenza di potenziale
-    if(tensione-Low_voltage>delta_carica+delta_carica){  //se la tenisone della cella corrente è molto maggiore di
-      Serial.println("GreaterBalance");                  //quella della cella a tensione minore avviamo il GreaterBalance
+  
+  if(tensione-Low_voltage>=delta_carica && Low_voltage!=60000){//c'è da fare una scarica per troppa differenza di potenziale
+    if(tensione-Low_voltage>delta_carica+delta_carica){        //se la tenisone della cella corrente è molto maggiore di
+      Serial.print("GreaterBalance ");                         //quella della cella a tensione minore avviamo il GreaterBalance
+      Serial.print("low: ");
+      Serial.print(Low_voltage);
+      Serial.print("cella: ");
+      Serial.println(tensione);
       GreaterBalance(Low_voltage,bms_ic, modulo_corrente, cella_corrente);
       *tempo_iniziale=millis();                          //inizializziamo il contatore che interrompera' il GreaterBalance dopo 1 minuto
     }

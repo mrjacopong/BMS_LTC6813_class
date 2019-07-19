@@ -160,6 +160,8 @@ void loop(){
       CloseRelay(relay_pin);              //in questo modo il controllo del relè passa a cella.carica()
       solo_una_volta=false;               //dopo essersi chiuso la prima volta per iniziare la carica
     }
+    ResetDischarge(bms_ic);//proviamo che succede
+    delay(50);
     VoltageMeasurment(bms_ic);           
     GpioMeasurment(bms_ic);
     is_charged=pacco.carica(bms_ic);       //algorimtmo di carica
@@ -170,11 +172,11 @@ void loop(){
     SpegniLed(led_sistema);
 
     if(charge_switch_state==LOW){                //se vogliamo interrompere la carica apriamo il rele' 
-      OpenRelay(relay_pin);               //e interrompiamo la scarica delle celle(bilanciamenti)
+      OpenRelay(relay_pin);                      //e interrompiamo la scarica delle celle(bilanciamenti)
       ResetDischarge(bms_ic);
       solo_una_volta=true;
     }
-    if(millis()-tempo_prec>30000){          //stampa ogni intervallo per la tabella
+    if(millis()-tempo_prec>3000){          //stampa ogni intervallo per la tabella
     tempo_prec=millis();
     pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
     }
