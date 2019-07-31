@@ -22,10 +22,23 @@ bool Pacco::ErrorCheck(cell_asic bms_ic[]){
 bool Pacco::carica(cell_asic bms_ic[]){
     for (int i=0;i<n_moduli;i++){
         if(modulo[i]->carica(bms_ic,i)){//true se carica
-            if(ReadCurrent()<0.05)      //controlla che la corrente sia abbastanza bassa
+            if(ReadCurrent()<0.05){     //controlla che la corrente sia abbastanza bassa
                 StopCharge(relay_pin);  //stoppa la carica del modulo in queestione
+                return true;
+            }
         }
     }
+    return false;
+}
+
+bool Pacco::Bilancia(cell_asic bms_ic[]){
+    for (int i=0;i<n_moduli;i++){
+        if(modulo[i]->Bilancia(bms_ic,i)){//true se ha finito il bilanciamento
+            StopBilanciamento(bms_ic);
+            return true; 
+        }
+    }
+    return false;
 }
 
 void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale di arduino

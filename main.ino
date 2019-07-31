@@ -112,7 +112,8 @@ unsigned long tempo_prec=0;
 
 ***********************************************************/
 bool in_carica=true;                 // true->in carica ; false->non in carica;
-bool is_charged=false;                //serve per controllare che stiamo caricando
+bool is_charged=false;               //serve per controllare che stiamo caricando
+bool is_balanced=false;              //serve per controllare che stiamo bilanciando
 bool solo_una_volta=true;            //per controllare che sia la prima volta che entriamo nel while e quindi dobbiamo chiudere il relè
 /************************************
   END SETUP
@@ -149,6 +150,7 @@ void setup()
 void loop(){
  
   bool charge_switch_state=digitalRead (charge_switch_pin);
+  bool balance_switch_state=digitalRead (balance_switch_pin);
   VoltageMeasurment(bms_ic);             //leggo le tensioni dall'adc
   GpioMeasurment(bms_ic);                //leggo le temperature dall'adc
   if(pacco.ErrorCheck(bms_ic))           //controllo degli errori
@@ -159,8 +161,9 @@ void loop(){
     if(solo_una_volta){                   //entra nell'if solo all'inizio del primo ciclo
       CloseRelay(relay_pin);              //in questo modo il controllo del relè passa a cella.carica()
       solo_una_volta=false;               //dopo essersi chiuso la prima volta per iniziare la carica
+      SpegniLed(led_sistema);
     }
-    ResetDischarge(bms_ic);//proviamo che succede
+    ResetDischarge(bms_ic);               //per misurare la tensione delle singole celle senza il carico della resistenza di scarica
     delay(50);
     VoltageMeasurment(bms_ic);           
     GpioMeasurment(bms_ic);
@@ -169,14 +172,13 @@ void loop(){
     delay(1000);
     
     last_millis_led1=Blink(led_carica,last_millis_led1); //codice per led di debug
-    SpegniLed(led_sistema);
 
     if(charge_switch_state==LOW){                //se vogliamo interrompere la carica apriamo il rele' 
       OpenRelay(relay_pin);                      //e interrompiamo la scarica delle celle(bilanciamenti)
       ResetDischarge(bms_ic);
       solo_una_volta=true;
     }
-    if(millis()-tempo_prec>3000){          //stampa ogni intervallo per la tabella
+    if(millis()-tempo_prec>3000){          //stampa la tabella
     tempo_prec=millis();
     pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
     }
@@ -194,7 +196,37 @@ void loop(){
   quindi setto is_charged falso in modo fa autorizzare la carica 
   per la prossima volta che voglio caricare
 
-  un po' difficile da capire, ma dovrebbe funzionare
+  un po' difficile da capire, ma dovrebbe funzionare*/
+
+  while (balance_switch_state==HIGH && !pacco.ErrorCheck(bms_ic) && !is_balanced) {
+    if(solo_una_volta){
+      solo_una_volta=false;
+      SpegniLed(led_sistema);
+    }
+    ResetDischarge(bms_ic);                              //per misurare la tensione delle singole celle senza il carico della resistenza di scarica
+    delay(50);
+    VoltageMeasurment(bms_ic);           
+    GpioMeasurment(bms_ic);
+    is_balanced=pacco.Bilancia(bms_ic);                  //algorimtmo di carica
+    balance_switch_state=digitalRead (balance_switch_pin);
+    delay(1000);
+    
+    last_millis_led1=Blink(led_carica,last_millis_led1); //blinkerà il led di carica
+
+    if(balance_switch_state==LOW){                       //se vogliamo interrompere la carica apriamo il rele' 
+      ResetDischarge(bms_ic);                            //e interrompiamo la scarica delle celle(bilanciamenti)
+      solo_una_volta=true;
+    }
+    if(millis()-tempo_prec>3000){                        //stampa la tabella
+    tempo_prec=millis();
+    pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
+    }
+  }
+
+  if(is_balanced && balance_switch_state==LOW) {
+    is_balanced=false;
+    solo_una_volta=true;
+  }
 
   /*debug*/
   if(millis()-tempo_prec>3000){        //stampa ogni intervallo per la tabella (se siamo fuori dal while)

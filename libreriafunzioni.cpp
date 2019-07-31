@@ -21,6 +21,13 @@ void ShoutdownError(){
   AccendiLed(led_errore);
   SpegniLed(led_carica);
   SpegniLed(led_bilanciamento_pesante);
+  Serial.println("errore ");
+}
+void  UnderVoltageShoutdown(){  //scollega il carico 
+  AccendiLed(led_errore);//momentaneo
+  OpenRelay(relay_pin);
+  SpegniLed(led_carica);
+  SpegniLed(led_bilanciamento_pesante);
 }
 bool TimeCheck(unsigned long t_inizio ,uint16_t durata_max ){        //true se l'errore persiste
   /*controllo della durata dell'errore*/
@@ -38,9 +45,16 @@ void InitPinOut(){ //inizzializza il pinout per l'arduino
   pinMode(led_sistema,OUTPUT);
   pinMode(led_carica,OUTPUT);
   pinMode(led_bilanciamento_pesante,OUTPUT);
+  pinMode(balance_switch_pin,INPUT);
 }
 bool StopCharge(uint8_t pin_out){  //ferma la carica 
   OpenRelay(pin_out);
+  return true;
+}
+
+bool StopBilanciamento(cell_asic bms_ic[]){  //ferma il bilanciamento
+  ResetDischarge(bms_ic);
+  Serial.println("bilanciamento completato");
   return true;
 }
 
@@ -103,7 +117,7 @@ float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //leg
   return (Temp);
 }
 void SetDischarge(int8_t cella,cell_asic bms_ic[]){
-  /*da testare quando acremo più moduli,non attiva ora perchè bisognerebbe modificare alcune librerie */
+  /*da testare quando avremo più moduli,non attiva ora perchè bisognerebbe modificare alcune librerie */
   //ltc6813_set_discharge(cella,modulo,bms_ic);
   ltc6813_set_discharge(cella,TOTAL_IC,bms_ic);
   wakeup_sleep(TOTAL_IC);

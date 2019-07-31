@@ -8,6 +8,7 @@
 #define led_errore 3
 #define relay_pin 6
 #define charge_switch_pin 2
+#define balance_switch_pin 9
 
 #include "ltc6813.h"
 const unsigned long intervalloBlink = 200;  //Parametri per la stampa 
@@ -24,6 +25,7 @@ const uint16_t MEASUREMENT_LOOP_TIME = 500;//milliseconds(mS)
 //Under Voltage and Over Voltage Thresholds
 const uint16_t OV_THRESHOLD = 42000; // Over voltage threshold ADC Code. LSB = 0.0001
 const uint16_t UV_THRESHOLD = 30000; // Under voltage threshold ADC Code. LSB = 0.0001
+const uint16_t cutoff_voltage = 25000;// la tensione più bassa a cui posso arrivare (secondo datasheet vtc5)
 const uint16_t MAXTEMP = 60;         // Over temperature GRADI CENTIGRADI
 const double MAXVOLTAGE = OV_THRESHOLD;    // per convertirla in double nella funzione ErrorCheck
 const uint16_t OV_TIME_LIMIT=500;    // limite di tempo in millisecondi OV
@@ -38,8 +40,9 @@ const uint8_t celle_usate=16;
 const uint8_t ntc_usati=1;
 
 //per algoritmo di carica
-const uint16_t delta_carica = 2000;      // massima differenza tra due batterie in serie (0.2v)
-const uint16_t delta_carica_finale = 200;// massima differenza tra due batterie in serie nel bilanciamento finale (0.08v)
+const uint16_t delta_carica = 2000;      // massima differenza tra due batterie (0.2v)
+const uint16_t delta_bilanciamento=130;  // massima differenza tra due batterie nell'algoritmo di bilanciamento non in carica(0.01v)
+const uint16_t delta_carica_finale = 200;// massima differenza tra due batterie nel bilanciamento finale (0.02v)
 const uint16_t soglia_carica=41000;      // soglia tensione carica (4.1V)
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
@@ -58,9 +61,11 @@ uint16_t IsLow(uint16_t low,uint16_t actual);
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
 void VoltageMeasurment(cell_asic bms_ic[]);
 void ShoutdownError();
+void  UnderVoltageShoutdown();
 bool TimeCheck(unsigned long t_inizio ,uint16_t durata_max );
 void InitPinOut();
 bool StopCharge(uint8_t pin_out);
+bool StopBilanciamento(cell_asic bms_ic[]);
 bool FinalBalance(uint16_t Low_voltage,uint16_t tensione,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempo_iniziale);
 void GreaterBalance(uint16_t tensoine_iniziale,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
 void IntermediateBalance(int8_t cella,cell_asic bms_ic[]);

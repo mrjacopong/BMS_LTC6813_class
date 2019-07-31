@@ -19,16 +19,21 @@ bool Cella::ErrorCheck(uint16_t tensione){
     questo avviene nell'else*/
     else{
       if(TimeCheck(tempo, OT_TIME_LIMIT))
-        ShoutdownError(); 
+        ShoutdownError();
       return true;
     }
   }
   else flag_error=false;                                        //in asssenza di error_OV il flag è diasttivato
-    
+  if(tensione <= cutoff_voltage){                               //controlla se c'è un under voltage, non è necessariamente un errore, ma stacca il carico
+    UnderVoltageShoutdown();
+    return true;
+  }
   return false;
 }
 
 bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente,unsigned long *tempo_iniziale){
+  if(Low_voltage==60000)
+    return false;
   /*controllo se la cella è carica*/
   if( tensione >= soglia_carica){
     bool prec_falg_in_scarica=flag_in_scarica;
@@ -42,10 +47,10 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uin
       else
         flag_in_scarica=true;
     }
-    return true;  //true -> la cella è carica
+    return true;  //true -> la cella è arrivata alla tensione di soglia
   }
   
-  if(tensione-Low_voltage>=delta_carica && Low_voltage!=60000){//c'è da fare una scarica per troppa differenza di potenziale
+  if(tensione-Low_voltage>=delta_carica){//c'è da fare una scarica per troppa differenza di potenziale
     if(tensione-Low_voltage>delta_carica+delta_carica){        //se la tenisone della cella corrente è molto maggiore di
       Serial.print("GreaterBalance ");                         //quella della cella a tensione minore avviamo il GreaterBalance
       Serial.print("low: ");
@@ -56,7 +61,6 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uin
       *tempo_iniziale=millis();                          //inizializziamo il contatore che interrompera' il GreaterBalance dopo 1 minuto
     }
     else{
-      IntermediateBalance(cella_corrente,bms_ic);        //se non è necessaria la GreaterBalance usiamo la IntermediateBalance
       flag_in_scarica=true;                              //settiamo il flag della scarica intermedia su vero
     }
   }
@@ -65,9 +69,27 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uin
       ResetDischarge(bms_ic);   
       flag_in_scarica=false;
     }
-  
   }
+  if(flag_in_scarica)
+    IntermediateBalance(cella_corrente,bms_ic);
   return false;                   //ritonra false -> vuol dire che la cella non è carica
+}
+
+bool Cella::Bilancia(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente){
+  if(Low_voltage==60000)
+    return false;
+  if(tensione-Low_voltage>=delta_bilanciamento ){
+    flag_in_scarica=true;
+  }
+  else{ 
+    if(flag_in_scarica && tensione-Low_voltage<delta_bilanciamento -20){
+      ResetDischarge(bms_ic);   
+      flag_in_scarica=false;
+    }
+  }
+  if(flag_in_scarica)
+    IntermediateBalance(cella_corrente,bms_ic);
+  return !flag_in_scarica;
 }
 
 
