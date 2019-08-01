@@ -40,10 +40,11 @@ const uint8_t celle_usate=16;
 const uint8_t ntc_usati=1;
 
 //per algoritmo di carica
-const uint16_t delta_carica = 2000;      // massima differenza tra due batterie (0.2v)
-const uint16_t delta_bilanciamento=130;  // massima differenza tra due batterie nell'algoritmo di bilanciamento non in carica(0.01v)
-const uint16_t delta_carica_finale = 200;// massima differenza tra due batterie nel bilanciamento finale (0.02v)
+const uint16_t delta_carica = 1000;      // massima differenza tra due batterie (0.1v)
+const uint16_t delta_bilanciamento=100;  // massima differenza tra due batterie nell'algoritmo di bilanciamento non in carica(0.01v)
+const uint16_t delta_carica_finale = 400;// massima differenza tra due batterie nel bilanciamento finale (0.04v)
 const uint16_t soglia_carica=41000;      // soglia tensione carica (4.1V)
+const uint16_t bilanciamento_off=300;    // differenza di tensione quando il bilanciamento viene fermato
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
 /*--variabili per ntc--*/

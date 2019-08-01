@@ -40,12 +40,13 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uin
     flag_in_scarica=FinalBalance(Low_voltage,tensione,bms_ic,modulo_corrente,cella_corrente,tempo_iniziale); //bilanciamento specifico per fine carica
     
     if (prec_falg_in_scarica==true && flag_in_scarica==false){
-      if(tensione-Low_voltage<=100){
+      if(tensione-Low_voltage<=bilanciamento_off){
         ResetDischarge(bms_ic);
         flag_in_scarica=false;
       }
       else
         flag_in_scarica=true;
+        IntermediateBalance(cella_corrente,bms_ic);
     }
     return true;  //true -> la cella è arrivata alla tensione di soglia
   }
@@ -65,7 +66,7 @@ bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uin
     }
   }
   else{ 
-    if(flag_in_scarica && tensione-Low_voltage<delta_carica -100){ //se si è scaricata abbastaza disattivo la scarica e spengo il flag
+    if(flag_in_scarica && tensione-Low_voltage<bilanciamento_off){ //se si è scaricata abbastaza disattivo la scarica e spengo il flag
       ResetDischarge(bms_ic);   
       flag_in_scarica=false;
     }
