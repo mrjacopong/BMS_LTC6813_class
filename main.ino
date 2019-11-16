@@ -133,17 +133,17 @@ Pacco pacco(TOTAL_IC,18,1);                   //array di ogetti
  ***********************************************************************/
 
 /*!**********************************************************************
-  \struttura per gli errori
+ //struttura per gli errori
  ***********************************************************************/
 
 void setup()
 {
   Serial.begin(115200);
-  spi_enable(SPI_CLOCK_DIV16); // This will set the Linduino to have a 1MHz Clock
+  spi_enable(SPI_CLOCK_DIV16);           // This will set the Linduino to have a 1MHz Clock
   ltc681x_init_cfg(TOTAL_IC, bms_ic);
   ltc6813_reset_crc_count(TOTAL_IC, bms_ic);
   ltc6813_init_reg_limits(TOTAL_IC, bms_ic);
-  InitPinOut();              //inizializza i pin per led e rele'
+  InitPinOut();                          //inizializza i pin per led e rele'
   StampaHeaderTabella();
 }
 
@@ -158,27 +158,27 @@ void loop(){
   
   
   while (charge_switch_state==HIGH && !pacco.ErrorCheck(bms_ic) && !is_charged) {  //se c'è un errore interrompo la carica uscendo dal ciclo di carica
-    if(solo_una_volta){                   //entra nell'if solo all'inizio del primo ciclo
-      CloseRelay(relay_pin);              //in questo modo il controllo del relè passa a cella.carica()
-      solo_una_volta=false;               //dopo essersi chiuso la prima volta per iniziare la carica
+    if(solo_una_volta){                  //entra nell'if solo all'inizio del primo ciclo
+      CloseRelay(relay_pin);             //in questo modo il controllo del relè passa a cella.carica()
+      solo_una_volta=false;              //dopo essersi chiuso la prima volta per iniziare la carica
       SpegniLed(led_sistema);
     }
-    ResetDischarge(bms_ic);               //per misurare la tensione delle singole celle senza il carico della resistenza di scarica
+    //ResetDischarge(bms_ic);            //per misurare la tensione delle singole celle senza il carico della resistenza di scarica
     delay(50);
     VoltageMeasurment(bms_ic);           
     GpioMeasurment(bms_ic);
-    is_charged=pacco.carica(bms_ic);       //algorimtmo di carica
+    is_charged=pacco.carica(bms_ic);     //algorimtmo di carica
     charge_switch_state=digitalRead (charge_switch_pin);
     delay(1000);
     
     last_millis_led1=Blink(led_carica,last_millis_led1); //codice per led di debug
 
-    if(charge_switch_state==LOW){                //se vogliamo interrompere la carica apriamo il rele' 
-      OpenRelay(relay_pin);                      //e interrompiamo la scarica delle celle(bilanciamenti)
+    if(charge_switch_state==LOW){        //se vogliamo interrompere la carica apriamo il rele' 
+      OpenRelay(relay_pin);              //e interrompiamo la scarica delle celle(bilanciamenti)
       ResetDischarge(bms_ic);
       solo_una_volta=true;
     }
-    if(millis()-tempo_prec>3000){          //stampa la tabella
+    if(millis()-tempo_prec>3000){        //stampa la tabella
     tempo_prec=millis();
     pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
     }
@@ -229,11 +229,11 @@ void loop(){
   }
 
   /*debug*/
-  if(millis()-tempo_prec>3000){        //stampa ogni intervallo per la tabella (se siamo fuori dal while)
+  if(millis()-tempo_prec>3000){                          //stampa ogni intervallo per la tabella (se siamo fuori dal while)
     tempo_prec=millis();
     pacco.StampaDebug(bms_ic, is_charged, charge_switch_state);
   }
-  last_millis_led2 = Blink(led_sistema,last_millis_led2); //codice per led di debug
+  last_millis_led2 = Blink(led_sistema,last_millis_led2);//codice per led di debug
   SpegniLed(led_carica);
   delay(1000);
 }

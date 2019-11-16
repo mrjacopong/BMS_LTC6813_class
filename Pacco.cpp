@@ -12,7 +12,7 @@ Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){
 
 }
 bool Pacco::ErrorCheck(cell_asic bms_ic[]){ 
-    for (int i=0;i<n_moduli;i++){ //controllo errore in pacco
+    for (int i=0;i<n_moduli;i++){                          //controllo errore in pacco
         if(modulo[i]->ErrorCheck(bms_ic,i)==true)
             return true;
     }
@@ -21,9 +21,10 @@ bool Pacco::ErrorCheck(cell_asic bms_ic[]){
 
 bool Pacco::carica(cell_asic bms_ic[]){
     for (int i=0;i<n_moduli;i++){
-        if(modulo[i]->carica(bms_ic,i)){//true se carica
-            if(ReadCurrent()<0.05){     //controlla che la corrente sia abbastanza bassa
-                StopCharge(relay_pin);  //stoppa la carica del modulo in queestione
+        if(modulo[i]->carica(bms_ic,i)){                   //true se carica
+            //pin da vedere il pin quale è
+            if(ReadCurrent(current_sensor,0,bms_ic)<0.05){ //controlla che la corrente sia abbastanza bassa
+                StopCharge(relay_pin);                     //stoppa la carica del modulo in queestione
                 return true;
             }
         }
@@ -33,7 +34,7 @@ bool Pacco::carica(cell_asic bms_ic[]){
 
 bool Pacco::Bilancia(cell_asic bms_ic[]){
     for (int i=0;i<n_moduli;i++){
-        if(modulo[i]->Bilancia(bms_ic,i)){//true se ha finito il bilanciamento
+        if(modulo[i]->Bilancia(bms_ic,i)){                 //true se ha finito il bilanciamento
             StopBilanciamento(bms_ic);
             return true; 
         }
@@ -41,7 +42,7 @@ bool Pacco::Bilancia(cell_asic bms_ic[]){
     return false;
 }
 
-void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale di arduino
+void Pacco::StampaVoltaggio (cell_asic bms_ic[]){          //stampa nel monitor seriale di arduino
     for (int i=0;i<n_moduli;i++){
             Serial.print("modulo");
             Serial.print(i);
@@ -50,7 +51,7 @@ void Pacco::StampaVoltaggio (cell_asic bms_ic[]){  //stampa nel monitor seriale 
     }
 }
 
-void Pacco::StampaTemp (cell_asic bms_ic[]){   //stampa nel monitor seriale di arduino 
+void Pacco::StampaTemp (cell_asic bms_ic[]){               //stampa nel monitor seriale di arduino 
     for (int i=0;i<n_moduli;i++){
             Serial.print("modulo");
             Serial.print(i);
@@ -68,8 +69,12 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool in_carica, bool carica_completa
             Serial.print(";");
         }
     }
+
+    Serial.print(ReadTempGrad (3,0,bms_ic));
+    Serial.print(";");
+
     for(int i=0; i<ntc_usati ;i++){
-            Serial.print(ReadTempGrad (3,0,bms_ic));
+            Serial.print(ReadCurrent(current_sensor,0,bms_ic));
             Serial.print(";");
     }  
     if(in_carica)

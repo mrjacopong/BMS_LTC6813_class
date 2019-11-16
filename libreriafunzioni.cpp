@@ -47,7 +47,7 @@ void InitPinOut(){ //inizzializza il pinout per l'arduino
   pinMode(led_bilanciamento_pesante,OUTPUT);
   pinMode(balance_switch_pin,INPUT);
 }
-bool StopCharge(uint8_t pin_out){  //ferma la carica 
+bool StopCharge(uint8_t pin_out){           //ferma la carica 
   OpenRelay(pin_out);
   return true;
 }
@@ -66,7 +66,7 @@ bool FinalBalance(uint16_t Low_voltage, uint16_t tensione,cell_asic bms_ic[],int
     return true;
   }
   
-  if (tensione >= 41900){          //tensione poco prima dell'errore
+  if (tensione >= semi_THRESHOLD){                    //tensione poco prima dell'errore
     GreaterBalance(Low_voltage,bms_ic,modulo,cella);
     *tempo_iniziale=millis();
     Serial.println("GreaterBalance dentro final");
@@ -94,7 +94,7 @@ void IntermediateBalance(int8_t cella,cell_asic bms_ic[]){
 
 
 void GpioMeasurment(cell_asic bms_ic[]){
-  wakeup_sleep(TOTAL_IC);                                             //converte gpio
+  wakeup_sleep(TOTAL_IC);                    //converte gpio
   ltc6813_adax(ADC_CONVERSION_MODE , AUX_CH_TO_CONVERT);
   ltc6813_pollAdc();
   wakeup_sleep(TOTAL_IC);
@@ -102,7 +102,7 @@ void GpioMeasurment(cell_asic bms_ic[]){
 }
 
 
-float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){    //legge la temperatura in gradi              //solo il pin passato             
+float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){   //legge la temperatura in gradi              //solo il pin passato             
   GpioMeasurment(bms_ic);                                                 //e l'IC passato
   float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;
   float Vref2=bms_ic[current_ic].aux.a_codes[5]*0.0001;
@@ -163,6 +163,7 @@ void StampaHeaderTabella(){
     Serial.print(i);
     Serial.print(";");
   }
+  Serial.print("corrente;");
   Serial.print("in carica;");
   Serial.print("carica completata");
   Serial.println();
@@ -198,6 +199,8 @@ void StampaDebug2(cell_asic bms_ic[], bool in_carica, bool carica_completata){
        Serial.print(ReadTempGrad (3,0,bms_ic));
        Serial.print(";");
     }
+
+
     if(in_carica)
       Serial.print("Si");
     else 
@@ -214,6 +217,14 @@ void StampaDebug2(cell_asic bms_ic[], bool in_carica, bool carica_completata){
     Serial.println();
 }
 
-float ReadCurrent(){
-  return 1;//faccio finta che passa 1A
+float ReadCurrent(uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){
+  float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;
+
+
+  /*conversione tensione -> corrente da implementare quando avremo il sensore */
+
+  //if (Vout<=0,01)
+  //  return 0;
+
+  return (Vout);                         //ritorna la corrente 
 }
