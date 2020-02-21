@@ -46,7 +46,7 @@ const uint16_t delta_bilanciamento=100;          // massima differenza tra due b
 const uint16_t delta_carica_finale = 400;        // massima differenza tra due batterie nel bilanciamento finale (0.04v)
 const uint16_t soglia_carica=41000;              // soglia tensione carica (4.1V)
 const uint16_t bilanciamento_off=300;            // differenza di tensione quando il bilanciamento viene fermato
-const uint16_t semi_THRESHOLD=OV_THRESHOLD - 100 // poco prima della tensione di errore per evitare di intrare in ShoutdownError durante la fine
+const uint16_t semi_THRESHOLD=OV_THRESHOLD - 100; // poco prima della tensione di errore per evitare di intrare in ShoutdownError durante la fine
 //questo valore viene controllato nel loop in modo tale che sia modificabile 
 //dinamicamente ogni volta che avviene il loop
 /*--variabili per ntc--*/
