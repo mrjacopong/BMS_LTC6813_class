@@ -3,7 +3,6 @@
 
 Modulo::Modulo(int N_celle,int N_ntc){
     flag_error=false;
-    low_voltage=60000;
     modulo_carico=false;
     n_celle=N_celle;
     n_ntc=N_ntc;
@@ -16,7 +15,7 @@ Modulo::Modulo(int N_celle,int N_ntc){
     for (int j=0;j<N_ntc;j++){
     ntc[j] = new Ntc();
     }
-
+    //soc=soc()
 }
 bool Modulo::ErrorCheck(cell_asic bms_ic[],int modulo_corrente){
     for (int i=0;i<n_celle;i++){                   //controllo errore overvoltage
@@ -34,7 +33,8 @@ bool Modulo::ErrorCheck(cell_asic bms_ic[],int modulo_corrente){
     return false;
 }
 
-bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente){
+bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente, uint16_t* low_voltage_puntatore){
+    uint16_t low_voltage= *low_voltage_puntatore;
     uint16_t prec_low_voltage=low_voltage;         //evita che la prima cella non si scarichi mai inizzializzo il low_voltage ad ogni ciclo 
     low_voltage=60000;                             //in quanto lo devo confrontare con ogni cella altrimenti viene confrontato il low_voltage vecchio
     if(tempo_iniziale==0){
@@ -42,7 +42,7 @@ bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente){
         for (int i=0;i<n_celle;i++){
             if ( i!= unused_ch_1 && i!= unused_ch_2) {
                 low_voltage=IsLow(low_voltage,bms_ic[modulo_corrente].cells.c_codes[i]); //trovo tensione minore
-                if (low_voltage<=prec_low_voltage) //controllo per avere sempre la tensione più bassa ad ogni ciclo
+                if (low_voltage<=prec_low_voltage) //controllo per avere sempre la tensione più bassa ad ogni ciclo (referito al for poco sopra)
                     prec_low_voltage=low_voltage;   
                 if (!cella[i]->carica(bms_ic[modulo_corrente].cells.c_codes[i],bms_ic,prec_low_voltage,modulo_corrente,i,&tempo_iniziale))
                     modulo_carico=false;           //se c'è almeno una cella scarica vuol dire che il modulo non è carico 
@@ -51,14 +51,16 @@ bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente){
     }
     else if(millis()-tempo_iniziale>=60000){       //una volta che siamo entrati in greater balance
         tempo_iniziale=0;                          //aspettiamo 60 secondi in modo da far scaricare
-        ResetDischarge(bms_ic);                    //le celle a tensione molto più alta
+        //ResetDischarge(bms_ic);                    //le celle a tensione molto più alta
+        /*wakeuptleep() non sono sicuro che funzioni, ho bisogno che per 60 sec non si disattvino le resistenze di scarica*/
         SpegniLed(led_bilanciamento_pesante);
         CloseRelay(relay_pin);
         modulo_carico=false;
     }
     return modulo_carico;
 }
-bool Modulo::Bilancia(cell_asic bms_ic[],int modulo_corrente){
+bool Modulo::Bilancia(cell_asic bms_ic[],int modulo_corrente, uint16_t* low_voltage_puntatore){
+    uint16_t low_voltage= *low_voltage_puntatore;
     uint16_t prec_low_voltage=low_voltage;         //evita che la prima cella non si scarichi mai
     low_voltage=60000;                             //inizzializzo il low_voltage ad ogni ciclo in quanto lo devo confrontare con ogni cella
     bool modulo_bilanciato=true;
@@ -72,6 +74,13 @@ bool Modulo::Bilancia(cell_asic bms_ic[],int modulo_corrente){
         }
     }
     return modulo_bilanciato;
+}
+
+uint16_t Modulo::Soc(){
+    for (int i=0;i<n_celle;i++){
+        soc=cella[i]->Soc();
+    }
+    return soc/(n_celle-2);                         //non conto le 2 celle che non usiamo
 }
 
 void Modulo::StampaVoltaggio (cell_asic bms_ic[],int modulo_corrente){  //stampa nel monitor seriale di arduino
@@ -99,6 +108,10 @@ bool Modulo::GetFlag(){
   return flag_error;
 }
 
+uint16_t Modulo::GetSoc(){
+  return soc;
+}
+
 bool Modulo::GetModulocarico(){
     return  modulo_carico;
 }
@@ -112,7 +125,5 @@ int Modulo::GetN_ntc(){
     return n_ntc;
 }
 
-uint16_t Modulo::GetLowVoltage(){
-    return low_voltage;
-}
+
 

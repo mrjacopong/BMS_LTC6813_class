@@ -23,6 +23,7 @@ class Cella : public Elemento{
     private:
         unsigned long tempo;
         bool flag_in_scarica;
+        uint16_t soc;
     public:
         Cella();
         bool ErrorCheck(uint16_t tensione);
@@ -30,12 +31,13 @@ class Cella : public Elemento{
         bool Bilancia(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente);
         bool GetFlag();
         unsigned long GetTempo();
+        uint16_t Soc();
+        uint16_t GetSoc();
 };
 
 class Modulo: public Elemento{
 
     private:
-       uint16_t low_voltage;
        bool modulo_carico;
        bool modulo_bilanciato;
        unsigned long tempo_iniziale;
@@ -43,26 +45,30 @@ class Modulo: public Elemento{
        Ntc** ntc;
        int n_celle;
        int n_ntc;
+       uint16_t soc;
     public :
        Modulo(int N_celle,int N_ntc);
        bool ErrorCheck(cell_asic bms_ic[],int modulo_corrente);
-       bool carica(cell_asic bms_ic[],int modulo_corrente);
-       bool Bilancia(cell_asic bms_ic[],int modulo_corrente);
+       bool carica(cell_asic bms_ic[],int modulo_corrente,uint16_t* low_voltage);
+       bool Bilancia(cell_asic bms_ic[],int modulo_corrente,uint16_t* low_voltage);
        void StampaVoltaggio (cell_asic bms_ic[], int modulo_corrente);   //stampa nel monitor seriale di arduino i volt di tutte le celle del modulo
        void StampaTemp (cell_asic bms_ic[], int modulo_corrente);        //stampa nel monitor seriale di arduino le temperature di tutti gli ntc del modulo
        bool GetFlag();
-       uint16_t GetLowVoltage();
        bool GetModulocarico();
        int GetN_celle();
        int GetN_ntc();
+       uint16_t Soc();
+       uint16_t GetSoc();
 
 };
 
 class Pacco: public Elemento{
 
     private:
+       uint16_t low_voltage;
        Modulo** modulo;
        int n_moduli;
+       uint16_t soc;
     public :
        cell_asic bms_ic;
        Pacco(int N_moduli,int N_celle,int N_ntc);
@@ -74,5 +80,8 @@ class Pacco: public Elemento{
        void StampaDebug(cell_asic bms_ic[], bool in_carica, bool CaricaCompleta);
        bool GetFlag();
        int GetN_moduli();
+       uint16_t GetLowVoltage();
+       uint16_t Soc();
+       uint16_t GetSoc();
 };
 #endif

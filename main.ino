@@ -128,6 +128,7 @@ bool solo_una_volta=true;            //per controllare che sia la prima volta ch
 
 cell_asic bms_ic[TOTAL_IC];                   //array di tensioni
 Pacco pacco(TOTAL_IC,18,1);                   //array di ogetti
+/*Pacco pacco(moduli,celle,ntc)*/
 /*!**********************************************************************
   \brief  Inititializes hardware and variables
  ***********************************************************************/
@@ -138,6 +139,21 @@ Pacco pacco(TOTAL_IC,18,1);                   //array di ogetti
 
 void setup()
 {
+  //set timer1 interrupt at 1Hz _DISABILITA analogWrite()_
+  cli();
+  TCCR1A = 0;// set entire TCCR1A register to 0
+  TCCR1B = 0;// same for TCCR1B
+  TCNT1  = 0;//initialize counter value to 0
+  // set compare match register for 1hz increments
+  OCR1A = 15624;// = (16*10^6) / (1*1024) - 1 (must be <65536)
+  // turn on CTC mode
+  TCCR1B |= (1 << WGM12);
+  // Set CS10 and CS12 bits for 1024 prescaler
+  TCCR1B |= (1 << CS12) | (1 << CS10);  
+  // enable timer compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
+  sei();
+  /*------------------------------------------------------------*/
   Serial.begin(115200);
   spi_enable(SPI_CLOCK_DIV16);           // This will set the Linduino to have a 1MHz Clock
   ltc681x_init_cfg(TOTAL_IC, bms_ic);
@@ -146,6 +162,11 @@ void setup()
   InitPinOut();                          //inizializza i pin per led e rele'
   StampaHeaderTabella();
 }
+
+ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz 
+  pacco.ErrorCheck(bms_ic);
+}
+
 
 void loop(){
  

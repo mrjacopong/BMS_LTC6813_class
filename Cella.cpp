@@ -5,6 +5,7 @@ Cella::Cella(){
     tempo=0;
     flag_error=false;
     flag_in_scarica=false;
+    //soc=soc()
 }
 
 bool Cella::ErrorCheck(uint16_t tensione){
@@ -31,7 +32,7 @@ bool Cella::ErrorCheck(uint16_t tensione){
   return false;
 }
 
-bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente,unsigned long *tempo_iniziale){
+bool Cella::carica(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,uint8_t modulo_corrente,uint8_t cella_corrente,unsigned long* tempo_iniziale){
   if(Low_voltage==60000)  //necessario per non buggare con la prima iterazione (quando low voltage = 60000 fittizio)
     return false;
   /*controllo se la cella è carica*/
@@ -92,9 +93,37 @@ bool Cella::Bilancia(uint16_t tensione,cell_asic bms_ic[],uint16_t Low_voltage,u
   return !flag_in_scarica;
 }
 
+uint16_t Cella::Soc(){
+/*
+  if (corrente()==0){
+    calcola_soc_da_ocv()
+  }
+  if (corrente > 0){
+    if (batteria_carica == true){
+      ricalibra_lo_stato_full()
+    }
+    else{
+      calcola_soc_con_CC
+    }
+  }
+  else{
+    if(tensione < treshold){
+      spegni_tutto_battery_low()
+      ricalibra_lo_stato_empty()
+    }
+    else{
+      calcola_dod_con_CC()
+    }
+  }
+*/
+  return 0;
+}
 
 bool Cella::GetFlag(){
   return flag_error;
+}
+uint16_t Cella::GetSoc(){
+  return soc;
 }
 
 unsigned long Cella::GetTempo(){
