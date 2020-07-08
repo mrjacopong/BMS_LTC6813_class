@@ -20,11 +20,7 @@ More information available [HERE](https://github.com/analogdevicesinc/Linduino).
 
 The comunication between Arduino and the LTC6813 follow the following diagram:
 
-```mermaid
-graph LR
-A[MCU] -- SPI --> B[LTC6820]
-B[LTC6820] -- isoSPI --> C[LTC6813] 
-```
+[![](https://mermaid.ink/img/eyJjb2RlIjoiXG5ncmFwaCBMUlxuQVtNQ1VdIC0tIFNQSSAtLT4gQltMVEM2ODIwXVxuQltMVEM2ODIwXSAtLSBpc29TUEkgLS0-IENbTFRDNjgxM10gXG4iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiXG5ncmFwaCBMUlxuQVtNQ1VdIC0tIFNQSSAtLT4gQltMVEM2ODIwXVxuQltMVEM2ODIwXSAtLSBpc29TUEkgLS0-IENbTFRDNjgxM10gXG4iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
 
  - [LTC6820](https://www.analog.com/en/products/ltc6820.html) provides galvanic isolation and translates signals from SPI and isoSPI.
  - [LTC6813](https://www.analog.com/en/products/ltc6813-1.html#product-samplebuy) is the ADC Integrated Circuit
@@ -39,5 +35,4 @@ The SPI communication gives the flexibility to use any capable MCU.
 |--|--|
 |MCU|Linduino
 |LTC6820|[DC1941D](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/dc1941d.html)
-|LTC6820|[DC2350A-b](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/dc2350a-b.html)
-|
+|LTC6820|[DC2350A-b](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/dc2350a-b.html)|
