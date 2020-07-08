@@ -97,8 +97,6 @@ void Pacco::StampaDebug(cell_asic bms_ic[], bool in_carica, bool carica_completa
     else 
         Serial.print("No");
 
-    Serial.print(";");
-
     Serial.println();
 }
 

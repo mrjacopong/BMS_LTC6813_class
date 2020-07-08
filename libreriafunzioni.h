@@ -42,7 +42,7 @@ const uint8_t ntc_usati=1;
 
 //per algoritmo di carica
 const uint16_t delta_carica = 1000;              // massima differenza tra due batterie (0.1v)
-const uint16_t delta_bilanciamento=100;          // massima differenza tra due batterie nell'algoritmo di bilanciamento non in carica(0.01v)
+const uint16_t delta_bilanciamento=100;          // massima differenza tra due batterie nell'algoritmo di bilanciamento (non in carica)(0.01v)
 const uint16_t delta_carica_finale = 400;        // massima differenza tra due batterie nel bilanciamento finale (0.04v)
 const uint16_t soglia_carica=41000;              // soglia tensione carica (4.1V)
 const uint16_t bilanciamento_off=300;            // differenza di tensione quando il bilanciamento viene fermato
@@ -59,31 +59,82 @@ const float Resistenza = 10000;
 
 
 /*Funzioni */
+
+/* return the highter number (top>actual) */
 uint16_t IsTop(uint16_t top,uint16_t actual);
+
+/* return the lower number (top<actual) */
 uint16_t IsLow(uint16_t low,uint16_t actual);
+
+/* read temperature in grad from a specific gpio pin */
 float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
+
+/* read all the voltage from every adc */
 void VoltageMeasurment(cell_asic bms_ic[]);
+
+/* error routine */
 void ShoutdownError();
+
+/* undervoltage error routine */
 void  UnderVoltageShoutdown();
+
+/* return true if it is passed a slot of time from t_inizio to durata_max */
 bool TimeCheck(unsigned long t_inizio ,uint16_t durata_max );
+
+/* initialize pinout of the arduino */
 void InitPinOut();
+
+/* open the charge relay and return true (stop charge routine) */
 bool StopCharge(uint8_t pin_out);
+
+/* stop balance resetting all the discharge pin */
 bool StopBilanciamento(cell_asic bms_ic[]);
+
+/* activate discharge resistor of "cella" during the final stage of the charge (with finer thresholds) */
 bool FinalBalance(uint16_t Low_voltage,uint16_t tensione,cell_asic bms_ic[],int8_t modulo,int8_t cella,unsigned long* tempo_iniziale);
+
+/* activate discharge resistor of "cella" when the voltages are very different */
 void GreaterBalance(uint16_t tensoine_iniziale,cell_asic bms_ic[],uint8_t modulo,uint8_t cella);
+
+/* activate discharge resistor of "cella" (resistors starts from 0) */
 void IntermediateBalance(int8_t cella,cell_asic bms_ic[]);
+
+/* read voltages from gpio */
 void GpioMeasurment(cell_asic bms_ic[]);
+
+/* read temperature in grad from gpio */
 float ReadTempGrad (uint8_t pin,uint8_t current_ic);
+
+/* activate discharge resistor of "cella" (resistors starts from 1) */
 void SetDischarge(int8_t cella,cell_asic bms_ic[]);
+
+/* refresh discharge signals to not be resetted by watchdog */
+void RefreshDischarge(cell_asic bms_ic[]);
+
+/* reset discharge signals to be off in every module*/
 void ResetDischarge(cell_asic bms_ic[]);
+
+/* open the relay at the arduino pin "relay" */
 void OpenRelay(uint8_t relay);
+
+/* close the relay at the arduino pin "relay" */
 void CloseRelay(uint8_t relay);
+
+/* print the header of the table in the serial monitor */
 void StampaHeaderTabella();
+
+/* turn on the led at the arduino pin "pin" */
 void AccendiLed(int pin);
+
+/* turn off the led at the arduino pin "pin" */
 void SpegniLed(int pin);
+
+/* let the led at the arduino pin "pin" to blink, counting time passed from "last_millis_led" */
 unsigned long Blink(int pin,unsigned long last_millis_led);
-void StampaDebug2(cell_asic bms_ic[], bool in_carica, bool carica_completata);
-float ReadCurrent(uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);//da implementare
+
+/* reads current value from a sensor at the gpio pin "pin" of the module "current_ic" (using ltc6813)
+   needs to be implemented */
+float ReadCurrent(uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
 
 
 

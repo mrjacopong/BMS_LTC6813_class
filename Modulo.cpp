@@ -7,14 +7,16 @@ Modulo::Modulo(int N_celle,int N_ntc){
     n_celle=N_celle;
     n_ntc=N_ntc;
     tempo_iniziale=0;
+    
     cella= new Cella* [N_celle];
     for (int i=0;i<N_celle;i++){
-    cella[i] = new Cella();
-    }
+        cella[i] = new Cella();
+        }
+
     ntc= new Ntc* [N_ntc];
     for (int j=0;j<N_ntc;j++){
-    ntc[j] = new Ntc();
-    }
+        ntc[j] = new Ntc();
+        }
     //soc=soc()
 }
 bool Modulo::ErrorCheck(cell_asic bms_ic[],int modulo_corrente){
@@ -49,13 +51,14 @@ bool Modulo::carica(cell_asic bms_ic[],int modulo_corrente, uint16_t* low_voltag
             }
         }
     }
-    else if(millis()-tempo_iniziale>=60000){       //una volta che siamo entrati in greater balance
-        tempo_iniziale=0;                          //aspettiamo 60 secondi in modo da far scaricare
-        //ResetDischarge(bms_ic);                    //le celle a tensione molto più alta
-        /*wakeuptleep() non sono sicuro che funzioni, ho bisogno che per 60 sec non si disattvino le resistenze di scarica*/
-        SpegniLed(led_bilanciamento_pesante);
-        CloseRelay(relay_pin);
-        modulo_carico=false;
+    else{
+        RefreshDischarge(bms_ic);
+        if(millis()-tempo_iniziale>=60000){        //una volta che siamo entrati in greater balance
+            tempo_iniziale=0;                      //aspettiamo 60 secondi in modo da far scaricare
+            SpegniLed(led_bilanciamento_pesante);  //le celle a tensione molto più alta
+            CloseRelay(relay_pin);
+            modulo_carico=false;
+        }
     }
     return modulo_carico;
 }

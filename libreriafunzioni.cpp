@@ -116,10 +116,18 @@ float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){   //legg
   float Temp = (pow(sum, -1)-274);
   return (Temp);
 }
+
 void SetDischarge(int8_t cella,cell_asic bms_ic[]){
   /*da testare quando avremo più moduli,non attiva ora perchè bisognerebbe modificare alcune librerie */
   //ltc6813_set_discharge(cella,modulo,bms_ic);
   ltc6813_set_discharge(cella,TOTAL_IC,bms_ic);
+  wakeup_sleep(TOTAL_IC);
+  ltc6813_wrcfg(TOTAL_IC,bms_ic);
+  ltc6813_wrcfgb(TOTAL_IC,bms_ic);
+}
+
+void RefreshDischarge(cell_asic bms_ic[]){
+  //ltc6813_set_discharge(1,TOTAL_IC,bms_ic);
   wakeup_sleep(TOTAL_IC);
   ltc6813_wrcfg(TOTAL_IC,bms_ic);
   ltc6813_wrcfgb(TOTAL_IC,bms_ic);
@@ -186,36 +194,6 @@ unsigned long Blink(int pin,unsigned long last_millis_led){
   return last_millis_led;
 }
 
-void StampaDebug2(cell_asic bms_ic[], bool in_carica, bool carica_completata){
-    Serial.print(millis());
-    Serial.print(";");
-    for(int i=0; i<TOTAL_CH ;i++){
-        if(i!=unused_ch_1 && i!=unused_ch_2){
-          Serial.print(bms_ic[0].cells.c_codes[i]*0.0001,4);
-          Serial.print(";");
-        }
-    }
-     for(int i=0; i<ntc_usati ;i++){
-       Serial.print(ReadTempGrad (3,0,bms_ic));
-       Serial.print(";");
-    }
-
-
-    if(in_carica)
-      Serial.print("Si");
-    else 
-      Serial.print("No");
-
-    Serial.print(";");
-    if(carica_completata)
-      Serial.print("Si");
-    else 
-      Serial.print("No");
-
-    Serial.print(";");
-
-    Serial.println();
-}
 
 float ReadCurrent(uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]){
   float Vout = bms_ic[current_ic].aux.a_codes[pin]*0.0001;

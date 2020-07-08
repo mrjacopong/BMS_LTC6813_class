@@ -59,28 +59,39 @@
   Copyright 2017 Linear Technology Corp. (LTC)
 */
 
-//--------------------compatibilità con schede non arduino uno-----------------------------//
-
-/*modifiche su LT_SPI.cpp
-FUNCTION-> void spi_write(int8_t  data) :175
-  SPI.transfer(data);
-  //SPDR = data;                  
-	//while (!(SPSR & _BV(SPIF)));  
-
-FUNCTION-> int8_t spi_read(int8_t  data) :183    
-  int8_t receivedVal = SPI.transfer(data);
-	return receivedVal;
-	//SPDR = data;
-	//while (!(SPSR & _BV(SPIF)));
-	//return SPDR; 
+//------------------------IMPORTANT changes in ltc681x.cpp---------------------------------//
+/*
+  if you are using an out of date version of ltc681x.cpp
+    IN -> ltc681x.cpp -> void clear_discharge(uint8_t total_ic, cell_asic ic[])
+    if there is any, add these lines of code:
+      ic[i].configb.tx_data[0] = 0;
+      ic[i].configb.tx_data[1] = 0;
+      
+  altrimenti non funziona ResetDischarge
 */
-/*modifiche su ltc681x.cpp IMPORTANTI
-  aggiungere a 
-  FUNCTION-> void clear_discharge(uint8_t total_ic, cell_asic ic[]) :1067
-    ic[i].configb.tx_data[0] = 0;
-    ic[i].configb.tx_data[1] = 0;
-  
-  altrimenti non funziona reset ResetDischarge*/
+
+//------------------------------- for vscode users ----------------------------------------//
+/*
+  with extension "Arduino for Visual Studio Code" by microsoft
+    in   settings.json
+    add  "C_Cpp.intelliSenseEngine": "Tag Parser" 
+*/
+
+//--------------------compatibilità con schede non arduino uno-----------------------------//
+/*
+  modifiche su LT_SPI.cpp
+    FUNCTION-> void spi_write(int8_t  data) :175
+      SPI.transfer(data);
+      //SPDR = data;                  
+      //while (!(SPSR & _BV(SPIF)));  
+
+    FUNCTION-> int8_t spi_read(int8_t  data) :183    
+      int8_t receivedVal = SPI.transfer(data);
+      return receivedVal;
+      //SPDR = data;
+      //while (!(SPSR & _BV(SPIF)));
+      //return SPDR; 
+*/
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -184,7 +195,7 @@ void loop(){
       solo_una_volta=false;              //dopo essersi chiuso la prima volta per iniziare la carica
       SpegniLed(led_sistema);
     }
-    //ResetDischarge(bms_ic);            //per misurare la tensione delle singole celle senza il carico della resistenza di scarica
+    ResetDischarge(bms_ic);            //per misurare la tensione delle singole celle senza il carico della resistenza di scarica
     delay(50);
     VoltageMeasurment(bms_ic);           
     GpioMeasurment(bms_ic);
