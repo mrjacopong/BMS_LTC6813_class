@@ -14,7 +14,7 @@ class Ntc : public Elemento{
         unsigned long tempo;
     public:
         Ntc();
-        bool ErrorCheck(uint16_t temperatura);
+        bool ErrorCheck(cell_asic bms_ic[],uint16_t temperatura,uint8_t current_IC,uint8_t current_NTC);
         bool GetFlag();
         unsigned long GetTempo();
 };
@@ -26,7 +26,7 @@ class Cella : public Elemento{
         uint16_t soc;
     public:
         Cella();
-        bool ErrorCheck(uint16_t tensione);
+        bool ErrorCheck(cell_asic bms_ic[],uint16_t tensione,uint8_t current_IC,uint8_t current_CELL);
         bool carica(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente,unsigned long* tempo_iniziale);
         bool Bilancia(uint16_t tensione,cell_asic bms_ic[],uint16_t top_voltage,uint8_t modulo_corrente,uint8_t cella_corrente);
         bool GetFlag();
@@ -53,6 +53,7 @@ class Modulo: public Elemento{
        bool Bilancia(cell_asic bms_ic[],int modulo_corrente,uint16_t* low_voltage);
        void StampaVoltaggio (cell_asic bms_ic[], int modulo_corrente);   //stampa nel monitor seriale di arduino i volt di tutte le celle del modulo
        void StampaTemp (cell_asic bms_ic[], int modulo_corrente);        //stampa nel monitor seriale di arduino le temperature di tutti gli ntc del modulo
+       void StampaDebug (cell_asic bms_ic[], int modulo_corrente);
        bool GetFlag();
        bool GetModulocarico();
        int GetN_celle();
@@ -70,14 +71,13 @@ class Pacco: public Elemento{
        int n_moduli;
        uint16_t soc;
     public :
-       cell_asic bms_ic;
-       Pacco(int N_moduli,int N_celle,int N_ntc);
+       Pacco(int N_moduli,int N_celle,int N_ntc,cell_asic bms_ic[]);
        bool ErrorCheck(cell_asic bms_ic[]);
        bool carica(cell_asic bms_ic[]);
        bool Bilancia(cell_asic bms_ic[]);            //quando volgiamo bilanciare il pacco separatamente dalla carica
        void StampaVoltaggio (cell_asic bms_ic[]);    //stampa nel monitor seriale di arduino il volt di tutte le celle del pacco
        void StampaTemp (cell_asic bms_ic[]);         //stampa nel monitor seriale di arduino la temperatura di tutti gli ntc del pacco   
-       void StampaDebug(cell_asic bms_ic[], bool in_carica, bool CaricaCompleta);
+       void StampaDebug (String messagge,cell_asic bms_ic[]);
        bool GetFlag();
        int GetN_moduli();
        uint16_t GetLowVoltage();

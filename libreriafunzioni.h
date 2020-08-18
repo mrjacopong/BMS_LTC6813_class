@@ -12,7 +12,7 @@
 #define current_sensor 1                         //sulla scheda: current_sensor+1
 
 #include "ltc6813.h"
-const unsigned long intervalloBlink = 200;       //Parametri per la stampa 
+const unsigned long intervalloBlink = 200;       //Parametri per la stampa
 
 //ADC Command Configurations
 const uint8_t ADC_OPT = ADC_OPT_DISABLED;        // See ltc6813_daisy.h for Options
@@ -73,10 +73,10 @@ float ReadTempGrad (uint8_t pin,uint8_t current_ic,cell_asic bms_ic[]);
 void VoltageMeasurment(cell_asic bms_ic[]);
 
 /* error routine */
-void ShoutdownError();
+void ShoutdownError(cell_asic bms_ic[],uint8_t modulo_corrente,uint8_t cella_corrente);
 
 /* undervoltage error routine */
-void  UnderVoltageShoutdown();
+void  UnderVoltageShoutdown(uint8_t modulo_corrente,uint8_t cella_corrente);
 
 /* return true if it is passed a slot of time from t_inizio to durata_max */
 bool TimeCheck(unsigned long t_inizio ,uint16_t durata_max );
@@ -122,6 +122,9 @@ void CloseRelay(uint8_t relay);
 
 /* print the header of the table in the serial monitor */
 void StampaHeaderTabella();
+
+/* print a string with a message, useful to manage errors*/
+void StampaStringaErrore(cell_asic bms_ic[],String messaggio);
 
 /* turn on the led at the arduino pin "pin" */
 void AccendiLed(int pin);

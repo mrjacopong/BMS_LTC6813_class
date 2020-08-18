@@ -25,11 +25,11 @@ bool Modulo::ErrorCheck(cell_asic bms_ic[],int modulo_corrente){
         //queste due celle sono sempre a 0v e non sono un errore
         if ((i== unused_ch_1) || (i == unused_ch_2))
             return false;
-        if (cella[i]->ErrorCheck(bms_ic[modulo_corrente].cells.c_codes[i])==true) 
+        if (cella[i]->ErrorCheck(bms_ic,bms_ic[modulo_corrente].cells.c_codes[i],modulo_corrente,i) == true )
             return true;
     }
     for (int j=0;j<n_ntc;j++){                     //controllo errore overtemperature
-       if( ntc[j]->ErrorCheck(bms_ic[modulo_corrente].aux.a_codes[j])==true)
+       if( ntc[j]->ErrorCheck(bms_ic,bms_ic[modulo_corrente].aux.a_codes[j],modulo_corrente,j) == true )
             return true;
     }
     return false;
@@ -105,6 +105,23 @@ void Modulo::StampaTemp (cell_asic bms_ic[],int modulo_corrente){       //stampa
             Serial.println("V");
         }
     }
+}
+
+void Modulo::StampaDebug (cell_asic bms_ic[],int modulo_corrente){
+
+    for(int i=0; i<TOTAL_CH ;i++){
+        if(i!=unused_ch_1 && i!=unused_ch_2){
+            Serial.print(bms_ic[modulo_corrente].cells.c_codes[i]*0.0001,4);
+            Serial.print(";");
+        }
+    }
+
+    for(int i=0; i<ntc_usati ;i++){
+        //Serial.print(ReadTempGrad (i,modulo_corrente,bms_ic));
+        Serial.print(ReadTempGrad (3,0,bms_ic));
+        Serial.print(";");
+    }  
+
 }
 
 bool Modulo::GetFlag(){

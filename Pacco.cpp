@@ -1,16 +1,15 @@
 #include "elementi.h"
 #include "libreriafunzioni.h"
 
-Pacco::Pacco(int N_moduli,int N_celle,int N_ntc){
+Pacco::Pacco(int N_moduli,int N_celle,int N_ntc,cell_asic bms_ic2[]){
     flag_error=false;
     low_voltage=60000;
     n_moduli=N_moduli;
     modulo= new Modulo* [N_moduli];
+    cell_asic* bms_ic = bms_ic2;
     for (int i=0;i<N_moduli;i++){
     modulo[i] = new Modulo(N_celle,N_ntc);
     }
-    cell_asic bms_ic;
-    //soc=soc();
 }
 bool Pacco::ErrorCheck(cell_asic bms_ic[]){ 
     for (int i=0;i<n_moduli;i++){                          //controllo errore in pacco
@@ -69,34 +68,14 @@ void Pacco::StampaTemp (cell_asic bms_ic[]){               //stampa nel monitor 
     }
 }
 
-void Pacco::StampaDebug(cell_asic bms_ic[], bool in_carica, bool carica_completata){
-    Serial.print(millis());
+void Pacco::StampaDebug(String message,cell_asic bms_ic[]){
+    Serial.print(millis());                                //print time
     Serial.print(";");
-    for(int i=0; i<TOTAL_CH ;i++){
-        if(i!=unused_ch_1 && i!=unused_ch_2){
-            Serial.print(bms_ic[0].cells.c_codes[i]*0.0001,4);
-            Serial.print(";");
-        }
+    Serial.print(message);                                //print message
+    Serial.print(";");
+    for (int i=0; i<TOTAL_IC ; i++){                       //print voltages
+        modulo[i]->StampaDebug(bms_ic,i);
     }
-
-    Serial.print(ReadTempGrad (3,0,bms_ic));
-    Serial.print(";");
-
-    for(int i=0; i<ntc_usati ;i++){
-            Serial.print(ReadCurrent(current_sensor,0,bms_ic));
-            Serial.print(";");
-    }  
-    if(in_carica)
-        Serial.print("Si");
-    else 
-        Serial.print("No");
-
-    Serial.print(";");
-    if(carica_completata)
-        Serial.print("Si");
-    else 
-        Serial.print("No");
-
     Serial.println();
 }
 

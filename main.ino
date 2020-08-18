@@ -138,8 +138,9 @@ bool solo_una_volta=true;            //per controllare che sia la prima volta ch
  ******************************************************/
 
 cell_asic bms_ic[TOTAL_IC];                   //array di tensioni
-Pacco pacco(TOTAL_IC,18,1);                   //array di ogetti
+Pacco pacco(TOTAL_IC,TOTAL_CH,ntc_usati,bms_ic);     //array di ogetti
 /*Pacco pacco(moduli,celle,ntc)*/
+
 /*!**********************************************************************
   \brief  Inititializes hardware and variables
  ***********************************************************************/
@@ -180,13 +181,14 @@ ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz
 
 
 void loop(){
- 
+
   bool charge_switch_state=digitalRead (charge_switch_pin);
   bool balance_switch_state=digitalRead (balance_switch_pin);
   VoltageMeasurment(bms_ic);             //leggo le tensioni dall'adc
   GpioMeasurment(bms_ic);                //leggo le temperature dall'adc
   if(pacco.ErrorCheck(bms_ic))           //controllo degli errori
-    ShoutdownError();                    //e spengo tutto se c'è un errore
+    
+    ShoutdownError(bms_ic,0,0);                 //e spengo tutto se c'è un errore
   
   
   while (charge_switch_state==HIGH && !pacco.ErrorCheck(bms_ic) && !is_charged) {  //se c'è un errore interrompo la carica uscendo dal ciclo di carica
@@ -212,7 +214,7 @@ void loop(){
     }
     if(millis()-tempo_prec>3000){        //stampa la tabella
     tempo_prec=millis();
-    pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
+    pacco.StampaDebug("prova",bms_ic);
     }
   }
 
@@ -251,7 +253,7 @@ void loop(){
     }
     if(millis()-tempo_prec>3000){                        //stampa la tabella
     tempo_prec=millis();
-    pacco.StampaDebug(bms_ic,charge_switch_state,is_charged);
+    pacco.StampaDebug("prova",bms_ic);
     }
   }
 
@@ -263,7 +265,7 @@ void loop(){
   /*debug*/
   if(millis()-tempo_prec>3000){                          //stampa ogni intervallo per la tabella (se siamo fuori dal while)
     tempo_prec=millis();
-    pacco.StampaDebug(bms_ic, is_charged, charge_switch_state);
+    pacco.StampaDebug("prova",bms_ic);
   }
   last_millis_led2 = Blink(led_sistema,last_millis_led2);//codice per led di debug
   SpegniLed(led_carica);

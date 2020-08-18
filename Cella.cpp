@@ -8,7 +8,7 @@ Cella::Cella(){
     //soc=soc()
 }
 
-bool Cella::ErrorCheck(uint16_t tensione){
+bool Cella::ErrorCheck(cell_asic bms_ic[],uint16_t tensione,uint8_t modulo_corrente,uint8_t cella_corrente){
   if(tensione> MAXVOLTAGE){
     if (flag_error==false){                                    //si triggera l'if se c'è
       tempo=millis();                                          //un error_OT nuovo lo segno
@@ -20,13 +20,13 @@ bool Cella::ErrorCheck(uint16_t tensione){
     questo avviene nell'else*/
     else{
       if(TimeCheck(tempo, OT_TIME_LIMIT))
-        ShoutdownError();
+        ShoutdownError(bms_ic,modulo_corrente, cella_corrente);
       return true;
     }
   }
   else flag_error=false;                                        //in asssenza di error_OV il flag è diasttivato
   if(tensione <= cutoff_voltage){                               //controlla se c'è un under voltage, non è necessariamente un errore, ma stacca il carico
-    UnderVoltageShoutdown();
+    UnderVoltageShoutdown(modulo_corrente, cella_corrente);
     return true;
   }
   return false;

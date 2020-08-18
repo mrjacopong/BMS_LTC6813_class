@@ -15,15 +15,16 @@ uint16_t IsLow(uint16_t low,uint16_t actual){                            //ritor
   return actual;
 }
 
-void ShoutdownError(){
+void ShoutdownError(cell_asic bms_ic[],uint8_t modulo_corrente,uint8_t cella_corrente){
   //ResetDischarge(bms_ic);
   OpenRelay(relay_pin);
   AccendiLed(led_errore);
   SpegniLed(led_carica);
   SpegniLed(led_bilanciamento_pesante);
-  Serial.println("errore ");
+  StampaStringaErrore(bms_ic,"ShoutdownError");
+
 }
-void  UnderVoltageShoutdown(){  //scollega il carico 
+void  UnderVoltageShoutdown(uint8_t modulo_corrente,uint8_t cella_corrente){  //scollega il carico 
   AccendiLed(led_errore);//momentaneo
   OpenRelay(relay_pin);
   SpegniLed(led_carica);
@@ -160,21 +161,44 @@ void VoltageMeasurment(cell_asic bms_ic[]){
 }
 
 void StampaHeaderTabella(){
-  Serial.print("Tempo;");
-  for (int i=0; i<celle_usate; i++){
-    Serial.print("cella ");
-    Serial.print(i);
-    Serial.print(";");
+  Serial.print("Tempo;Messaggio;");
+  for (int j=0;j<TOTAL_IC;j++){
+    for (int i=0; i<celle_usate; i++){
+      Serial.print("cella ");
+      Serial.print(i+j*celle_usate);
+      Serial.print(";");
+    }
+    for (int i=0; i<ntc_usati; i++){
+      Serial.print("ntc ");
+      Serial.print(i+j*ntc_usati);
+      Serial.print(";");
+    }
   }
-  for (int i=0; i<ntc_usati; i++){
-    Serial.print("ntc ");
-    Serial.print(i);
-    Serial.print(";");
-  }
-  Serial.print("corrente;");
-  Serial.print("in carica;");
-  Serial.print("carica completata");
   Serial.println();
+}
+
+void StampaStringaErrore(cell_asic bms_ic[],String message){
+  
+  Serial.print(millis());                                //print time
+  Serial.print(";");
+  Serial.print(message);                                //print message
+  Serial.print(";");
+  
+  for (int modulo_corrente=0; modulo_corrente<TOTAL_IC ; modulo_corrente++){
+    for(int i=0; i<TOTAL_CH ;i++){                       //print voltages
+      if(i!=unused_ch_1 && i!=unused_ch_2){
+        Serial.print(bms_ic[modulo_corrente].cells.c_codes[i]*0.0001,4);
+        Serial.print(";");}
+    }
+
+    for(int i=0; i<ntc_usati ;i++){
+      //Serial.print(ReadTempGrad (i,modulo_corrente,bms_ic));
+      Serial.print(ReadTempGrad (3,0,bms_ic));
+      Serial.print(";");
+    }
+  }  
+  Serial.println();
+
 }
 
 void AccendiLed(int pin){

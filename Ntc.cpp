@@ -5,7 +5,7 @@ Ntc::Ntc(){
     flag_error=false;
 }
 
-bool Ntc::ErrorCheck(uint16_t temperatura){
+bool Ntc::ErrorCheck(cell_asic bms_ic[],uint16_t temperatura,uint8_t current_IC,uint8_t current_NTC){
   if(temperatura  > MAXTEMP){
     if (flag_error==false){                    //si triggera l'if se c'è  
       flag_error=true;                         //un error_OT nuovo lo segno 
@@ -15,9 +15,10 @@ bool Ntc::ErrorCheck(uint16_t temperatura){
     ma bisogna controllare che il tempo non ecceda il limite
     questo avviene nell'else*/
     else{
-      if(TimeCheck(tempo, OT_TIME_LIMIT))
-        ShoutdownError();
+      if(TimeCheck(tempo, OT_TIME_LIMIT)){
+        ShoutdownError(bms_ic,current_IC,current_NTC+19); //NTC19->NTC1, NTC20->NTC2...
         return true;
+      }
     }
   }
   else flag_error=false;                       //in asssenza di error_OV il flag è diasttivato
