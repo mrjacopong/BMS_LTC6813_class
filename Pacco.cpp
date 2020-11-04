@@ -32,9 +32,9 @@ bool Pacco::carica(cell_asic bms_ic[]){
     return false;
 }
 
-bool Pacco::Bilancia(cell_asic bms_ic[]){
+bool Pacco::Bilancia(cell_asic bms_ic[]){                  //bilanciamento delle celle senza caricare
     for (int i=0;i<n_moduli;i++){
-        if(modulo[i]->Bilancia(bms_ic,i,&low_voltage)){                 //true se ha finito il bilanciamento
+        if(modulo[i]->Bilancia(bms_ic,i,&low_voltage)){    //true se ha finito il bilanciamento
             StopBilanciamento(bms_ic);
             return true; 
         }

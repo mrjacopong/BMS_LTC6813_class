@@ -61,7 +61,7 @@
 
 //------------------------IMPORTANT changes in ltc681x.cpp---------------------------------//
 /*
-  if you are using an out of date version of ltc681x.cpp
+  if you are using an out of date version of ltc681x.cpp :1067
     IN -> ltc681x.cpp -> void clear_discharge(uint8_t total_ic, cell_asic ic[])
     if there is any, add these lines of code:
       ic[i].configb.tx_data[0] = 0;
